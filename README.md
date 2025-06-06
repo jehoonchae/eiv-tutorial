@@ -1,16 +1,16 @@
 # Causal Inference with Error-Prone Variables
 
-This is a self-contained tutorial on how to adjust for **measurement error** in causal inference settings, especially when treatment or observed confounder variables are error-prone.
+This is a self-contained tutorial on how to adjust for **measurement error** in causal inference research, specifically when your treatment variable or observed confounder variables are error-prone.
 
 We demonstrate:
 
 - What happens to causal effect estimation when measurement error is ignored
-- Why this leads to biased estimates (often attenuation)
+- Why this leads to biased estimates (often attenuation bias)
 - Two methods for correction:
   - **Regression Calibration** (a classical approach)
   - **Control Variates** (a modern and flexible strategy)
 
-The tutorial includes step-by-step R simulations, visualizations, and code explanations to illustrate each concept.
+The tutorial includes step-by-step R simulations, visualizations, code explanations, and practice problems to illustrate each concept.
 
 ---
 
@@ -44,11 +44,11 @@ You can view the tutorial as a rendered HTML page here:
 
 ## 🧠 Background
 
-This tutorial was created as the final project for **Stats 256: Causality**, taught by Professor [Chad Hazlett](https://www.chadhazlett.com/) at **UCLA** in **Spring 2025**.
+This tutorial was created as a final project for **Stats 256: Causality**, taught by Professor [Chad Hazlett](https://www.chadhazlett.com/) at **UCLA** in **Spring 2025**.
 
 **Authors:**
 - [Je Hoon Chae](https://jehoonchae.github.io/)
-- Daniela R. Amaya
+- [Daniela R. Amaya](https://www.linkedin.com/in/danielaramaya/)
 
 ---
 
