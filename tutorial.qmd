@@ -1,0 +1,21 @@
+---
+title: "Causal Inference with Error-Prone Variables"
+author: 
+  - Je Hoon Chae
+  - Daniela R. Amaya
+date: today
+---
+
+# Introduction
+
+# What if we ignore measurement error?
+
+## When error-prone variable is a treatment variable
+
+## When error-prone variable is an observed confounder
+
+# Parametric approach: Regression calibration
+
+# Control variates approach
+
+@yang2020combining

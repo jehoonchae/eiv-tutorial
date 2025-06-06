@@ -1,0 +1,17 @@
+project:
+  type: website
+  output-dir: docs
+
+format:
+  html:
+    toc: true
+    code-fold: true
+    css: styles/custom.scss
+
+bibliography: refs/references.bib
+csl: refs/chicago-author-date.csl
+
+execute:
+  echo: true
+  warning: false
+  message: false
