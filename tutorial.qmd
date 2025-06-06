@@ -8,6 +8,36 @@ date: today
 
 # Introduction
 
+## Measurement Errors in DAGs and Potential Outcomes
+
+### No Measurement Error
+
+![](images/dag_no_error.svg){fig-align="center" width=40%}
+
+- $X$ is an observed confounder
+- Identification assumption: $Y_d \perp\!\!\!\perp D \mid X$
+
+---
+
+### Measurement Error in Treatment Variable
+
+![](images/dag_error_in_treatment.svg){fig-align="center" width=40%}
+
+- We cannot observe $D$ directly; instead, we observe $D^*$
+- $D^*$ is a proxy or noisy measurement of $D$
+- Even if $Y_d \perp\!\!\!\perp D \mid X$, identification via $D^*$ is not guaranteed: Does $Y_d \perp\!\!\!\perp D^* \mid X$ hold?
+
+---
+
+### Measurement Error in Observed Confounder
+
+![](images/dag_error_in_confounder.svg){fig-align="center" width=40%}
+
+- We cannot observe $X$ directly; instead, we observe $X^*$
+- $X^*$ is a proxy or noisy measurement of $X$
+- We know that $Y_d \perp\!\!\!\perp D \mid X$, but what about $Y_d \perp\!\!\!\perp D  \mid X^*$?
+
+
 # What if we ignore measurement error?
 
 ## When error-prone variable is a treatment variable
