@@ -8,6 +8,12 @@ date: today
 
 # Introduction
 
+## Notations
+
+Throughout this tutorial, we adopt the following notation consistently. Let $D_i$ denote the treatment assignment status for unit $i$, where $d \in \{0, 1\}$ in the case of a binary treatment, though the framework can be extended to settings with multiple or continuous treatment levels. Let $Y_{di}$ represent the potential outcome for unit $i$ under treatment condition $d$. When the treatment is binary, the observed outcome for unit $i$ is given by the standard switching equation: $Y_i = D_i Y_{1i} + (1 - D_i) Y_{0i}$. 
+
+We denote observed confounders using $X_i$ for a single variable, and $\textbf{X}_i$ for a row vector of multiple confounders for unit $i$. To indicate error-prone or proxy measures, we append an asterisk to the variable name. For example, $X_i^*$ denotes a noisy or proxy measure of $X_i$, and $D_i^*$ denotes a mismeasured/noisy/proxy version of the treatment variable $D_i$.
+
 ## Measurement Errors in DAGs and Potential Outcomes
 
 ### No Measurement Error
