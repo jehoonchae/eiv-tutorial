@@ -1,4 +1,3 @@
-```markdown
 # Causal Inference with Error-Prone Variables
 
 This is a self-contained tutorial on how to adjust for **measurement error** in causal inference settings, especially when treatment or observed confounder variables are error-prone.
