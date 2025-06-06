@@ -44,7 +44,7 @@ You can view the tutorial as a rendered HTML page here:
 
 ## 🧠 Background
 
-This tutorial was created as the final project for **Stats 256: Causal Inference**, taught by Professor [Chad Hazlett](https://www.chadhazlett.com/) at **UCLA** in **Spring 2025**.
+This tutorial was created as the final project for **Stats 256: Causality**, taught by Professor [Chad Hazlett](https://www.chadhazlett.com/) at **UCLA** in **Spring 2025**.
 
 **Authors:**
 - [Je Hoon Chae](https://jehoonchae.github.io/)
@@ -71,4 +71,3 @@ quarto::render("tutorial.qmd")
 ## 📄 License
 
 This project is licensed under the [MIT License](LICENSE).
-```
