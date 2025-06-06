@@ -1,9 +1,11 @@
 /* === Base typography tweaks === */
 body {
-    font-family: "Helvetica Neue", sans-serif;
+    font-weight: 300;
     font-size: 1.05rem;
     line-height: 1.6;
-    color: #212529;
+    text-rendering: optimizeLegibility;
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    color: #222222;
   }
   
   /* === Header styling === */
