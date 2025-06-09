@@ -6,38 +6,28 @@ author:
 date: today
 ---
 
-# Introduction````
+# Introduction
 
 An often unstated assumption in causal inference is that all variables are measured without error; however, in practice measurement error can exist in any/all variables including observed confounders, treatment, and even outcome variables. This error can be due to noise, bias, or limitations in measurement instruments. For the sake of causal inference, we are not interested in the measurement error per se, but rather its effect on our causal assumptions and the downstream effect on the treatment estimate.
 
-In this tutorial we first model measurement error in the language of DAGs and potential outcomes. We then use Monte Carlo simulations to demonstrate what happens when measurement error is ignored in the treatment and observed confounder variables (we do not cover error in outcome variables). Finally, we will discuss methods for addressing measurement error. We demonstrate regression calibration, control variates, and sensitivity analysis in detail.
+In this tutorial we first model measurement error in the language of DAGs and potential outcomes. We then use Monte Carlo simulations to demonstrate what happens when measurement error is ignored in the treatment and observed confounder variables (we do not cover error in outcome variables). Finally, we will discuss methods for addressing this measurement error. We demonstrate regression calibration, control variates, and sensitivity analysis in detail.
 
 ## A concrete example for understanding measurement error
 
-We will consider a simplified model of the causal effect of college on future earnings as a running example throughout this tutorial. You might imagine that one's family socioeconomic status (SES) is a confounding variable that affects both your going to college and your future earnings. In DAG form this looks like: 
+We will consider a simplified model of the causal effect of college on future earnings as a running example throughout this tutorial. You can imagine that one's family socioeconomic status (SES) is a confounding variable that affects both your going to college and your future earnings. In DAG form this looks like: 
 
-\begin{center}
-  {\begin{tikzpicture}[scale=0.8, transform shape,
-    dot/.style={circle, fill=black, inner sep=1.5pt},
-    square/.style={draw, rectangle, thick, minimum size=6mm, inner sep=0pt},
-    arrow/.style={-{Latex[width=1.5mm,length=3mm]}, thick}
-  ]
-  \node[dot, label=above:$Family SES$] at (0,1) (X) {};
-  \node[dot, label=left:$College$] at (-1,0) (D) {};
-  \node[dot, label=right:$Future Earnings$] at (1,0) (Y) {};
-  \draw[arrow] (X) -- (D);
-  \draw[arrow] (X) -- (Y);
-  \draw[arrow] (D) -- (Y);
-\end{tikzpicture}}  
-\end{center}
+![](images/dag_college_future_earnings.svg){fig-align="center" width=60%}
 
-# Measurement Errors in DAGs and Potential Outcomes
 
-## Notations
 
-Throughout this tutorial, we adopt the following notation consistently. Let $D_i$ denote the treatment assignment status for unit $i$, where $d \in \{0, 1\}$ in the case of a binary treatment, though the framework can be extended to settings with multiple or continuous treatment levels. Let $Y_{di}$ represent the potential outcome for unit $i$ under treatment condition $d$. When the treatment is binary, the observed outcome for unit $i$ is given by the standard switching equation: $Y_i = D_i Y_{1i} + (1 - D_i) Y_{0i}$. 
+# Measurement Error in the language of DAGs and Potential Outcomes
 
-We denote observed confounders using $X_i$ for a single variable, and $\textbf{X}_i$ for a row vector of multiple confounders for unit $i$. To indicate error-prone or proxy measures, we append an asterisk to the variable name. For example, $X_i^*$ denotes a noisy or proxy measure of $X_i$, and $D_i^*$ denotes a mismeasured/noisy/proxy version of the treatment variable $D_i$.
+Throughout this tutorial, we adopt the following notation consistently:
+
+- Let $D_i$ denote the treatment assignment status for unit $i$, where $d \in \{0, 1\}$ in the case of a binary treatment, though the framework can be extended to settings with multiple or continuous treatment levels
+- Let $Y_{di}$ represent the potential outcome for unit $i$ under treatment condition $d$. When the treatment is binary, the observed outcome for unit $i$ is given by the standard switching equation: $Y_i = D_i Y_{1i} + (1 - D_i) Y_{0i}$
+- We denote observed confounders using $X_i$ for a single variable, and $\textbf{X}_i$ for a row vector of multiple confounders for unit $i$
+- To indicate error-prone or proxy measures, we append an asterisk to the variable name. For example, $X_i^*$ denotes a noisy or proxy measure of $X_i$, and $D_i^*$ denotes a mismeasured/noisy/proxy version of the treatment variable $D_i$
 
 ## No Measurement Error
 
@@ -52,9 +42,13 @@ We denote observed confounders using $X_i$ for a single variable, and $\textbf{X
 
 ![](images/dag_error_in_treatment.svg){fig-align="center" width=40%}
 
-- We cannot observe $D$ directly; instead, we observe $D^*$
+- We cannot observe $D$ directly; instead, we observe $D^*$ (a descendant of $D$)
 - $D^*$ is a proxy or noisy measurement of $D$
-- Even if $Y_d \perp\!\!\!\perp D \mid X$, identification via $D^*$ is not guaranteed: Does $Y_d \perp\!\!\!\perp D^* \mid X$ hold?
+- Our POM identification assumption is $Y_d \perp\!\!\!\perp D \mid X$, however identification using $D^*$ is not guaranteed: $Y_d \not\!\!\perp\!\!\!\perp D^* \mid X$
+
+Returning to our example of the effect of college on future earnings, say your dataset includes the indicator variable $CollegeDegree$ for whether or not an individual obtained a degree. In a scenario where a student attended say 3 years of college but did not graduate, they would appear as untreated in your data but their exposure to college could still be influencing their future earnings. Thus, your treatment variable is measured with error.
+
+![](images/dag_error_in_college.svg){fig-align="center" width=60%}
 
 ---
 
@@ -62,12 +56,16 @@ We denote observed confounders using $X_i$ for a single variable, and $\textbf{X
 
 ![](images/dag_error_in_confounder.svg){fig-align="center" width=40%}
 
-- We cannot observe $X$ directly; instead, we observe $X^*$
+- We cannot observe $X$ directly; instead, we observe $X^*$ (a descendant of $X$)
 - $X^*$ is a proxy or noisy measurement of $X$
-- We know that $Y_d \perp\!\!\!\perp D \mid X$, but what about $Y_d \perp\!\!\!\perp D  \mid X^*$?
+- Even if we know that $Y_d \perp\!\!\!\perp D \mid X$, identification using $X^*$ is not guaranteed: $Y_d \not\!\!\perp\!\!\!\perp D  \mid X^*$
+
+Again, returning to our example of the effect of college on future earnings, our confounder SES is difficult to define and even harder to measure. Let's say our dataset contains students' FAFSA data as a noisy proxy for SES (financial aid application summarizing family income and assets), our DAG would look something like:
+
+![](images/dag_error_in_ses.svg){fig-align="center" width=60%}
 
 
-# What if we ignore measurement error?
+# What happens if we ignore measurement error?
 
 ## When error-prone variable is a treatment variable
 
