@@ -1,12 +1,37 @@
 ---
-title: "Causal Inference with Error-Prone Variables"
+title: "A Tutorial on Causal Inference with Error-Prone Variables"
 author: 
-  - Je Hoon Chae
-  - Daniela R. Amaya
+  - Je Hoon Chae (UCLA)
+  - Daniela R. Amaya (UCLA)
 date: today
 ---
 
-# Introduction
+# Introduction````
+
+An often unstated assumption in causal inference is that all variables are measured without error; however, in practice measurement error can exist in any/all variables including observed confounders, treatment, and even outcome variables. This error can be due to noise, bias, or limitations in measurement instruments. For the sake of causal inference, we are not interested in the measurement error per se, but rather its effect on our causal assumptions and the downstream effect on the treatment estimate.
+
+In this tutorial we first model measurement error in the language of DAGs and potential outcomes. We then use Monte Carlo simulations to demonstrate what happens when measurement error is ignored in the treatment and observed confounder variables (we do not cover error in outcome variables). Finally, we will discuss methods for addressing measurement error. We demonstrate regression calibration, control variates, and sensitivity analysis in detail.
+
+## A concrete example for understanding measurement error
+
+We will consider a simplified model of the causal effect of college on future earnings as a running example throughout this tutorial. You might imagine that one's family socioeconomic status (SES) is a confounding variable that affects both your going to college and your future earnings. In DAG form this looks like: 
+
+\begin{center}
+  {\begin{tikzpicture}[scale=0.8, transform shape,
+    dot/.style={circle, fill=black, inner sep=1.5pt},
+    square/.style={draw, rectangle, thick, minimum size=6mm, inner sep=0pt},
+    arrow/.style={-{Latex[width=1.5mm,length=3mm]}, thick}
+  ]
+  \node[dot, label=above:$Family SES$] at (0,1) (X) {};
+  \node[dot, label=left:$College$] at (-1,0) (D) {};
+  \node[dot, label=right:$Future Earnings$] at (1,0) (Y) {};
+  \draw[arrow] (X) -- (D);
+  \draw[arrow] (X) -- (Y);
+  \draw[arrow] (D) -- (Y);
+\end{tikzpicture}}  
+\end{center}
+
+# Measurement Errors in DAGs and Potential Outcomes
 
 ## Notations
 
@@ -14,9 +39,7 @@ Throughout this tutorial, we adopt the following notation consistently. Let $D_i
 
 We denote observed confounders using $X_i$ for a single variable, and $\textbf{X}_i$ for a row vector of multiple confounders for unit $i$. To indicate error-prone or proxy measures, we append an asterisk to the variable name. For example, $X_i^*$ denotes a noisy or proxy measure of $X_i$, and $D_i^*$ denotes a mismeasured/noisy/proxy version of the treatment variable $D_i$.
 
-## Measurement Errors in DAGs and Potential Outcomes
-
-### No Measurement Error
+## No Measurement Error
 
 ![](images/dag_no_error.svg){fig-align="center" width=40%}
 
@@ -25,7 +48,7 @@ We denote observed confounders using $X_i$ for a single variable, and $\textbf{X
 
 ---
 
-### Measurement Error in Treatment Variable
+## Measurement Error in Treatment Variable
 
 ![](images/dag_error_in_treatment.svg){fig-align="center" width=40%}
 
@@ -35,7 +58,7 @@ We denote observed confounders using $X_i$ for a single variable, and $\textbf{X
 
 ---
 
-### Measurement Error in Observed Confounder
+## Measurement Error in Observed Confounder
 
 ![](images/dag_error_in_confounder.svg){fig-align="center" width=40%}
 
