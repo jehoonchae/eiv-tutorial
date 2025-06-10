@@ -4,6 +4,18 @@ project:
 
 format:
   html:
+    math: mathjax
+    include-in-header:
+      text: |
+        <script type="text/javascript">
+        MathJax = {
+          tex: {
+            macros: {
+              indep: "\\perp\\!\\!\\!\\perp"
+            }
+          }
+        };
+        </script>
     toc: true
     code-fold: true
     css: styles/custom.scss
