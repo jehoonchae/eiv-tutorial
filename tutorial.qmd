@@ -1,59 +1,225 @@
 ---
-title: "Causal Inference with Error-Prone Variables"
-subtitle: "A Gentle Introduction and Bias Adjustment Using Validation Data"
+title: "A Tutorial on Causal Inference with Error-Prone Variables"
 author: 
-  - Je Hoon Chae
-  - Daniela R. Amaya
+  - Je Hoon Chae (UCLA)
+  - Daniela R. Amaya (UCLA)
 date: today
 ---
 
 # Introduction
 
-<<<<<<< Updated upstream
-## Measurement Errors in DAGs and Potential Outcomes
-
-### No Measurement Error
-=======
 ## Notations
 
 Throughout this tutorial, we adopt the following notation consistently. Let $D_i$ denote the treatment assignment status for unit $i$, where $d \in \{0, 1\}$ in the case of a binary treatment, though the framework can be extended to settings with multiple or continuous treatment levels. Let $Y_{di}$ represent the potential outcome for unit $i$ under treatment condition $d$. When the treatment is binary, the observed outcome for unit $i$ is given by the standard switching equation: $Y_i = D_i Y_{1i} + (1 - D_i) Y_{0i}$. We denote observed confounders using $X_i$ for a single variable, and $\textbf{X}_i$ for a row vector of multiple confounders for unit $i$. To indicate error-prone or proxy measures, we append an asterisk to the variable name. For example, $X_i^*$ denotes a noisy or proxy measure of $X_i$, and $D_i^*$ denotes a mismeasured/noisy/proxy version of the treatment variable $D_i$.
 
-# Measurement Errors in DAGs and Potential Outcomes
+## Measurement Errors in DAGs and Potential Outcomes
+
+### No Measurement Error
+=======
+An often unstated assumption in causal inference is that all variables are measured without error; however, in practice measurement error can exist in any/all variables including observed confounders, treatment, and even outcome variables. This error can be due to noise, bias, or limitations in measurement instruments. For the sake of causal inference, we are not interested in the measurement error per se, but rather its effect on our causal assumptions and the downstream effect on the treatment estimate.
+
+In this tutorial we first model measurement error in the language of DAGs and potential outcomes. We then use Monte Carlo simulations to demonstrate what happens when measurement error is ignored in the treatment and observed confounder variables (we do not cover error in outcome variables). Finally, we will discuss methods for addressing this measurement error. We demonstrate direct correction/adjustment, regression calibration, control variates, and sensitivity analysis.
+
+## A concrete example for understanding measurement error
+
+We will consider a simplified model of the causal effect of college on future earnings as a running example throughout this tutorial. You can imagine that one's family socioeconomic status (SES) is a confounding variable that affects both your going to college and your future earnings. In DAG form this looks like: 
+
+![](images/dag_college_future_earnings.svg){fig-align="center" width=60%}
+
+
+# Measurement Error in the language of DAGs and Potential Outcomes
+
+Throughout this tutorial, we adopt the following notation consistently:
+
+- Let $D_i$ denote the treatment assignment status for unit $i$, where $d \in \{0, 1\}$ in the case of a binary treatment, though the framework can be extended to settings with multiple or continuous treatment levels
+- Let $Y_{di}$ represent the potential outcome for unit $i$ under treatment condition $d$. When the treatment is binary, the observed outcome for unit $i$ is given by the standard switching equation: $Y_i = D_i Y_{1i} + (1 - D_i) Y_{0i}$
+- We denote observed confounders using $X_i$ for a single variable, and $\textbf{X}_i$ for a row vector of multiple confounders for unit $i$
+- To indicate error-prone or proxy measures, we append an asterisk to the variable name. For example, $X_i^*$ denotes a noisy or proxy measure of $X_i$, and $D_i^*$ denotes a mismeasured/noisy/proxy version of the treatment variable $D_i$
 
 ## No Measurement Error
->>>>>>> Stashed changes
 
 ![](images/dag_no_error.svg){fig-align="center" width=40%}
 
 - $X$ is an observed confounder
 - Identification assumption: $Y_d \indep D \mid X$
-
----
+=======
 
 ## Measurement Error in Treatment Variable
 
 ![](images/dag_error_in_treatment.svg){fig-align="center" width=40%}
 
-- We cannot observe $D$ directly; instead, we observe $D^*$
+- We cannot observe $D$ directly; instead, we observe $D^*$ (a descendant of $D$)
 - $D^*$ is a proxy or noisy measurement of $D$
 - Even if $Y_d \indep D \mid X$, identification via $D^*$ is not guaranteed: Does $Y_d \indep D^* \mid X$ hold?
+=======
 
----
+Returning to our example of the effect of college on future earnings, say your dataset includes the indicator variable $CollegeDegree$ for whether or not an individual obtained a degree. In a scenario where a student attended say 3 years of college but did not graduate, they would appear as untreated in your data but their exposure to college could still be influencing their future earnings. Thus, your treatment variable is measured with error.
+
+![](images/dag_error_in_college.svg){fig-align="center" width=60%}
 
 ## Measurement Error in Observed Confounder
 
 ![](images/dag_error_in_confounder.svg){fig-align="center" width=40%}
 
-- We cannot observe $X$ directly; instead, we observe $X^*$
+- We cannot observe $X$ directly; instead, we observe $X^*$ (a descendant of $X$)
 - $X^*$ is a proxy or noisy measurement of $X$
-- We know that $Y_d \indep D \mid X$, but what about $Y_d \indep D  \mid X^*$?
+- Even if we know that $Y_d \perp\!\!\!\perp D \mid X$, identification using $X^*$ is not guaranteed: $Y_d \not\!\!\perp\!\!\!\perp D  \mid X^*$
+=======
+
+Again, returning to our example of the effect of college on future earnings, our confounder SES is difficult to define and even harder to measure. Let's say our dataset contains students' FAFSA data as a noisy proxy for SES (financial aid application summarizing family income and assets), our DAG would look something like:
+
+![](images/dag_error_in_ses.svg){fig-align="center" width=60%}
 
 
-# What if we ignore measurement error?
+# What happens if we ignore measurement error?
 
-## When error-prone variable is a treatment variable
+This section uses Monte Carlo simulations to demonstrate the implications of ignoring measurement error in your treatment and confounder variables.
 
-## When error-prone variable is an observed confounder
+## Error in treatment
+
+In the scenario where our treatment variable is measured with error, we would like to estimate,
+
+$$
+\begin{aligned}
+&\text{\textbf{\textcolor{red}{True Model:}}} \\
+&Y_i = \alpha + \beta D_i + \epsilon_i \quad  \text{where} \; D_i \sim \mathcal{N}(0, 1) \; \text{and} \; \epsilon_i \sim \mathcal{N}(0, 1)
+\end{aligned}
+$$
+
+But instead we have,
+
+$$
+\begin{aligned}
+&\text{\textbf{Observed Model:}} \\
+&Y_i = \tilde{\alpha} + \tilde{\beta} D_i^* + \tilde{\epsilon}_i \quad \; \text{where} \; D_i^* = D_i + \eta_i \; \text{and} \; \eta_i \sim \mathcal{N}(0, 1)  
+\end{aligned}
+$$
+
+Consider a simulation with $N=1000$ observations where the true effect $\beta = 2$:
+
+- What if the measurement error was heteroscedastic?
+- What if the true effect was negative, $\beta = -2$?
+
+**In sum, measurement error in the treatment variable attenuates the true effect. This is often referred to as "attenuation bias."**
+
+## Error in observed confounder
+
+In the scenario where an observed confounder is measured with error, we would like to estimate:
+
+$$
+\begin{aligned}
+&\text{\textbf{\textcolor{red}{True Model:}}} \\
+&Y_i = \alpha + \beta D_i +\gamma X_i + \epsilon_i \quad 
+\text{where} \; D_i \sim \mathcal{N}(0, 1), \; X_i \sim \mathcal{N}(0, 1), \; \text{and} \; \epsilon_i \sim \mathcal{N}(0, 1)
+\end{aligned}
+$$
+
+But instead we see: 
+
+$$
+\begin{aligned}
+&\text{\textbf{Observed Model:}} \\
+&Y_i = \tilde{\alpha} + \tilde{\beta} D_i + \tilde{\gamma} X_i^* + \tilde{\epsilon}_i \quad \text{where } \; X_i^* = X_i + \eta_i \; \text{and} \; \eta_i \sim \mathcal{N}(0, 1)  
+\end{aligned}
+$$
+
+Consider a scenario where $\text{corr}(D_i, X_i) = +0.7$. In a simulation with $N=1000$ observations, $\beta = 1$, and $\gamma = 2$:
+
+- What if $\text{corr}(D_i, X_i) = -0.7$?
+
+**In sum, measurement error in observed confounders can lead to biased estimates of the treatment effect in any direction.**
+
+# Methods for addressing measurement error
+
+Generally, the methods available for addressing measurement error depend on whether or not your study design enables you to collect additional data which illuminates information about the error in your variables. This type of additional data commonly falls into 2 cases:
+
+- **Validation Data:** Where you collect "gold standard" measurements of the error-prone variable for a subset of the sample. In our effect of college on future earnings example, this could look like administering a survey that collects additional data about students' family SES beyond FAFSA measures such as: information about families' social networks, prior zip codes the student has lived in, and participation in extracurricular activities.
+- **Repeated Mesurements:** Where you collect repeated measurements from each individual subject and estimate the variance of the measurement error, $\eta_i \sim \mathcal{N}(0, \sigma^2_\eta)$. Again, in our college example this could look like collecting a students' FAFSA data across every year they were enrolled in college to estimate the variance.
+
+In the situation where you have additional validation data, your measurement error problem essentially turns into a missing data problem. Much research has been produced in this area and includes methods such as multiple imputation and regression calibration.
+
+In the scenario where you are unable to collect additional data about your error prone variables, you are forced to assume a parametric structure of the measurement error generating process based on previous studies or prior knowledge. Without additional data, non-parametric identification is generally not possible. In this situation, available methods include likelihood-based approached, SIMEX, and IV. We explore direct correction/adjustment, regression calibration, control variates, and sensitivity analysis below.  
+
+## Direct Correction/Adjustment: Using validation data
+
+Consider the following DAG where there is measurement error in our variable for treatment:
+
+![](images/dag_error_in_treatment.svg){fig-align="center" width=40%}
+
+We observe:
+$$(Y_i, D_i^*, X_i, S_i) \quad \forall i\in \{1, \ldots, N\}$$
+However for a subset $n$ of our sample we have additional validation data:
+
+$$(Y_j, D_j^*, D_j, X_j, S_j = 1) \quad \forall j\in \{1, \ldots, n\}$$
+We can then:
+
+1. Estimate $\widehat{\mathbb{E}}[D_i \mid D_i^*, X_i]$ from the validation data, and
+2. $\widehat{\mathbb{E}}[D_i \mid D_i^*, X_i]$ to estimate $\mathbb{E}[Y_i \mid D_i, X_i]$
+
+## Parametric Approach: Regression Calibration
+
+An oldie but a goodie! Suppose our true model is:
+
+$$g\big(\mathbb{E}[Y_i \mid D_i, X_i]\big) = \alpha + \beta D_i + \gamma X_i$$
+To express the outcome regression in terms of observed variables, we apply the law of iterated expectations:
+$$
+\begin{aligned}
+\mathbb{E}[Y_i \mid D_i^*, X_i] &= \mathbb{E}_{D_i \mid D_i^*, X_i} [\mathbb{E}[Y_i \mid D_i, D_i^*, X_i]]\\
+&= \mathbb{E}_{D_i \mid D_i^*, X_i} [\mathbb{E}[Y_i \mid D_i, X_i]] \quad \text{(by } Y_i \perp\!\!\!\perp D_i^* \mid D_i, X_i\text{)}\\
+&= \mathbb{E}_{D_i \mid D_i^*, X_i} \left[ \alpha + \beta D_i + \gamma X_i \right] \\
+&= \alpha + \beta \cdot \mathbb{E}[D_i \mid D_i^*, X_i] + \gamma X_i     
+\end{aligned}
+$$
+This yields the regression calibration approximation:
+$$\mathbb{E}[Y_i \mid D_i^*, X_i] \approx \alpha + \beta \cdot \mathbb{E}[D_i \mid D_i^*, X_i] + \gamma X_i$$
+We can then:
+
+1. Estimate $\mathbb{E}[D_i \mid D_i^*, X_i]$ using OLS, ML, or multiple imputation
+2. Plug in our predicted $\widehat{\mathbb{E}}[D_i \mid D_i^*, X_i]$ to approximate the regression using the latent $D_i$
+
+## Control Variates Approach
+
+When we have validation data, the control variates approach allows us to:
+
+- Avoid making parametric assumptions
+- Use an estimator that is unbiased and more efficient than only using our validation data (such as in the methods previously discussed)
+
+Let's first define the following four values:
+
+$$
+\begin{align*}
+    \tau &:= \mathbb{E}[Y_{1i} - Y_{0i}] \quad \text{where} \; d \in \{0, 1\} \\[1.5em]
+    \tau_{\text{val}} &:= \mathbb{E}[Y_{1i} - Y_{0i} \mid S_i = 1] \\
+    &= \mathbb{E}_{X \mid S=1}\left[\mathbb{E}[Y_{i} \mid D_i=1, X_i, S_i = 1] - \mathbb{E}[Y_{i} \mid D_i=0, X_i, S_i = 1]\right] \\[1.5em]
+    \tau_{\text{val}}^{\text{ep}} &:= \mathbb{E}_X[\mathbb{E}[Y_i| X_i, D_i^* = 1, S_i = 1]- \mathbb{E}[Y_i| X_i, D_i^*=0, S_i = 1]] \\[1.5em]
+    \tau_{\text{full}}^{\text{ep}} &:= \mathbb{E}_X[\mathbb{E}[Y_i\mid X_i, D_i^* = 1] - \mathbb{E}[Y_i\mid X_i, D_i^*=0]]
+\end{align*}
+$$
+<span style="margin-left:3em;">Additionally,</span>
+
+$$
+\sqrt{n}\begin{pmatrix} \hat{\tau}_{\text{val}} - \tau \\ \widehat{\tau}_{\text{val}}^{\text{ep}} - \widehat{\tau}_{\text{full}}^{\text{ep}}\end{pmatrix} \xrightarrow{d} \mathcal{N}(0, \Sigma)\quad \text{where} \quad \Sigma = \begin{bmatrix} v & \Gamma^\top \\ \Gamma & V\end{bmatrix}
+$$
+<span style="margin-left:4em;">And,</span>
+
+$$
+  \widehat{\Gamma} = \widehat{\text{Cov}}(\hat{\tau}_{\text{val}}, \hat{\tau}_{\text{val}}^{\text{ep}} - \hat{\tau}_{\text{full}}^{\text{ep}}) \quad \text{and} \quad \widehat{V} = \widehat{\text{Var}}(\hat{\tau}_{\text{val}}^{\text{ep}} - \hat{\tau}_{\text{full}}^{\text{ep}})
+$$
+
+To compute our estimator:
+
+- $\hat{\tau}_{\text{CV}} = \hat{\tau}_{\text{val}} - b \left( \hat{\tau}_{\text{val}}^{\text{ep}} - \hat{\tau}_{\text{full}}^{\text{ep}} \right)$
+- $b= \widehat{\Gamma}^\top \widehat{V}^{-1} = \text{Cov}(\hat{\tau}_{\text{val}}, \hat{\tau}_{\text{val}}^{\text{ep}} - \hat{\tau}_{\text{full}}^{\text{ep}}) / \text{Var}(\hat{\tau}_{\text{val}}^{\text{ep}} - \hat{\tau}_{\text{full}}^{\text{ep}})$ ensures $\text{Var}(\hat{\tau}_{\text{CV}}) \leq \text{Var}(\hat{\tau}_{\text{val}})$ (because $\text{Var}(\hat{\tau}_{\text{CV}}) = v - \Gamma^\top V^{-1} \Gamma$)
+- $\hat{\tau}_{\text{val}}^{\text{ep}} - \hat{\tau}_{\text{full}}^{\text{ep}}$ (i.e., the control variate) is mean-zero and correlated with $\hat{\tau}_{\text{val}}$
+- Estimator for each $\hat{\tau}_{\text{val}}$, $\hat{\tau}_{\text{val}}^{\text{ep}}$, and $\hat{\tau}_{\text{full}}^{\text{ep}}$ can be flexible but Yang and Ding (2019) and Barnatchez et al. (2024) used AIPW
+- 95% CIs: $\hat{\tau}_{\text{CV}} \pm 1.96 \cdot \sqrt{\hat{v} - \hat{\Gamma}^\top \hat{V}^{-1} \hat{\Gamma}}$
+
+Let's see this graphically in a simulation where,
+
+- We set true ATE to 2 via $Y_1 = Y_0 + 2$, where $Y_0 = \exp(X_1)/4 + \sin(2X_2) + \varepsilon$
+- Treatment $A$ assigned via $\text{logit}^{-1}(X_1 + 0.5 X_2)$; $A^*$ flips $A$ with 15\% probability
+- Sample size $N = 1000$; Repeat 1000 times
+
 
 # Correcting Bias with Validation in a Subsample
 
@@ -78,5 +244,20 @@ $$
 In this case, $\hat{\tau}_{\text{val}}$ is an unbiased estimator for $\tau$, i.e., $\mathbb{E}[\hat{\tau}_{\text{val}}] = \tau$. However, relying solely on the validation subset may be inefficient, especially when the subset is small. Although unbiased, $\hat{\tau}_{\text{val}}$ may suffer from high variance, resulting in wide confidence intervals and limited inferential value.
 
 The control variates approach addresses this issue by starting with $\hat{\tau}_{\text{val}}$ and then leveraging auxiliary information from the full sample—where only the error-prone $D_i^*$ is available—to improve estimation precision. The core idea is to extract the informative component of $D_i^*$ in a way that reduces variance without introducing bias, thereby improving the asymptotic efficiency of the estimator.
+=======
+Which is:
+
+$$
+\begin{aligned}
+&= \sqrt{\dfrac{R^2_{Y \sim X \mid D}}{1 - R^2_{X \sim D}}} \cdot 
+\frac{\text{sd}(Y^{\perp D})}{\text{sd}(D^{\perp X^*})} \cdot 
+\left[ (1 - \rho) + \rho \cdot \sqrt{\frac{1 - \rho}{\rho}} \right] \\
+&= \sqrt{
+  \frac{\rho \cdot R^2_{Y \sim X^* \mid D} \cdot (1 - R^2_{X^* \sim D})}
+  { \left(\rho - R^2_{X^* \sim D}\right)^2}
+  } \cdot \frac{\text{sd}(Y^{\perp D})}{\text{sd}(D^{\perp X^*})} \cdot 
+  \left[(1 - \rho) + \rho \cdot \sqrt{\frac{1 - \rho}{\rho}} \right]
+\end{aligned}
+$$
 
 @yang2020combining
