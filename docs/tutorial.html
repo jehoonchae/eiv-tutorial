@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.42">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Je Hoon Chae (UCLA)">
+<meta name="author" content="Daniela R. Amaya (UCLA)">
+<meta name="dcterms.date" content="2025-06-13">
+
+<title>A Tutorial on Causal Inference with Error-Prone Variables</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-79108a0fc1995748cbd19a5b0e3e3e7c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script type="text/javascript">
+MathJax = {
+  tex: {
+    macros: {
+      indep: "\\perp\\!\\!\\!\\perp",
+      notindep: "\\not\\!\\!\\perp\\!\\!\\!\\perp"
+    }
+  }
+};
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="styles/custom.scss">
+</head>
+
+<body>
+
+<div id="quarto-search-results"></div>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a>
+  <ul class="collapse">
+  <li><a href="#notations" id="toc-notations" class="nav-link" data-scroll-target="#notations">Notations</a></li>
+  </ul></li>
+  <li><a href="#measurement-errors-in-dags-and-potential-outcomes" id="toc-measurement-errors-in-dags-and-potential-outcomes" class="nav-link" data-scroll-target="#measurement-errors-in-dags-and-potential-outcomes">Measurement Errors in DAGs and Potential Outcomes</a>
+  <ul class="collapse">
+  <li><a href="#example-measurement-of-college-and-family-ses-with-proxy-variables" id="toc-example-measurement-of-college-and-family-ses-with-proxy-variables" class="nav-link" data-scroll-target="#example-measurement-of-college-and-family-ses-with-proxy-variables">Example: Measurement of College and Family SES with Proxy Variables</a></li>
+  </ul></li>
+  <li><a href="#what-happens-if-we-ignore-measurement-error" id="toc-what-happens-if-we-ignore-measurement-error" class="nav-link" data-scroll-target="#what-happens-if-we-ignore-measurement-error">What Happens If We Ignore Measurement Error?</a>
+  <ul class="collapse">
+  <li><a href="#measurement-error-in-treatment-aka-attenuation-bias" id="toc-measurement-error-in-treatment-aka-attenuation-bias" class="nav-link" data-scroll-target="#measurement-error-in-treatment-aka-attenuation-bias">Measurement Error in Treatment (aka Attenuation Bias)</a></li>
+  <li><a href="#measurement-error-in-an-observed-confounder" id="toc-measurement-error-in-an-observed-confounder" class="nav-link" data-scroll-target="#measurement-error-in-an-observed-confounder">Measurement Error in an Observed Confounder</a></li>
+  </ul></li>
+  <li><a href="#correcting-bias-with-validation-in-a-subsample" id="toc-correcting-bias-with-validation-in-a-subsample" class="nav-link" data-scroll-target="#correcting-bias-with-validation-in-a-subsample">Correcting Bias with Validation in a Subsample</a>
+  <ul class="collapse">
+  <li><a href="#parametric-approach-regression-calibration" id="toc-parametric-approach-regression-calibration" class="nav-link" data-scroll-target="#parametric-approach-regression-calibration">Parametric Approach: Regression Calibration</a></li>
+  <li><a href="#control-variates-approach" id="toc-control-variates-approach" class="nav-link" data-scroll-target="#control-variates-approach">Control Variates Approach</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">A Tutorial on Causal Inference with Error-Prone Variables</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Authors</div>
+    <div class="quarto-title-meta-contents">
+             <p>Je Hoon Chae (UCLA) </p>
+             <p>Daniela R. Amaya (UCLA) </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">June 13, 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>In efforts to draw causal inferences from empirical data, researchers routinely address methodological challenges such as unobserved confounding, selection bias, and post-treatment variables. Yet, the problem of measurement error—particularly in key covariates or treatment variables—remains comparatively underexamined. Even when investigators include all theoretically relevant and observable confounders in their analytic models, the presence of measurement error compromises the validity of such adjustments. A covariate measured imprecisely no longer serves as a reliable control; rather, it behaves as if partially unobserved, thereby reintroducing bias into the causal estimation process. In this sense, the reliability of measurement serves not merely as a technical detail, but as a conceptual bridge between observed and unobserved confounding: the lower the reliability, the greater the extent to which measured covariates recede into the background as effectively unmeasured sources of bias.</p>
+<p>Measurement error is an endemic feature of empirical work. Researchers often rely on imprecise instruments—be it due to respondent misreporting, interviewer error, or limitations of the survey instrument itself. For example, demographic variables may be inaccurately recorded through careless administration, proxy measures may be used for constructs that are difficult or impossible to observe directly, or the target variable is inherently latent, such as depressive symptoms or political ideology, and thus intrinsically noisy even under ideal measurement conditions.</p>
+<p>This tutorial pursues two objectives. First, through a series of simple simulations, we demonstrate the consequences of measurement error in covariates and treatment variables on causal effect estimation. We show how such errors bias the target estimand and undermine standard analytic procedures. Second, we introduce two widely applicable adjustment strategies—regression calibration and control variates—that leverage validation subsamples containing accurate measurements. These techniques offer practical tools for mitigating the deleterious effects of measurement error and restoring inferential credibility.</p>
+<section id="notations" class="level2">
+<h2 class="anchored" data-anchor-id="notations">Notations</h2>
+<p>Throughout this tutorial, we adhere to a consistent notational convention. Let <span class="math inline">\(D_i\)</span> denote the treatment assignment for unit <span class="math inline">\(i\)</span>, where <span class="math inline">\(d \in {0, 1}\)</span> in the binary case. While our discussion centers on binary treatments, the analytical framework extends in a straightforward manner to settings involving multi-valued or continuous treatments. The potential outcome corresponding to treatment level <span class="math inline">\(d\)</span> for unit <span class="math inline">\(i\)</span> is denoted by <span class="math inline">\(Y_{di}\)</span>. Under a binary treatment regime, the observed outcome follows the canonical switching equation: <span class="math inline">\(Y_i = D_i Y_{1i} + (1 - D_i) Y_{0i}\)</span>.</p>
+<p>We represent observed covariates by <span class="math inline">\(X_i\)</span> in the univariate case, and by <span class="math inline">\(\textbf{X}_i\)</span> when referring to a vector of pre-treatment characteristics for unit <span class="math inline">\(i\)</span>. To distinguish true values from their imperfect or proxy counterparts, we adopt the conventional notation of appending an asterisk. Accordingly, <span class="math inline">\(X_i^*\)</span> denotes a noisy or error-prone measurement of <span class="math inline">\(X_i\)</span>, and <span class="math inline">\(D_i^*\)</span> refers to a mismeasured or surrogate version of the treatment variable <span class="math inline">\(D_i\)</span>.</p>
+<p>Finally, in empirical contexts where validation subsamples are available—that is, subsets of the data for which gold-standard measurements of treatment or covariates are obtained—we define an indicator variable <span class="math inline">\(S_i\)</span>, such that <span class="math inline">\(S_i = 1\)</span> if unit <span class="math inline">\(i\)</span> is included in the validation sample, and <span class="math inline">\(S_i = 0\)</span> otherwise.</p>
+</section>
+</section>
+<section id="measurement-errors-in-dags-and-potential-outcomes" class="level1">
+<h1>Measurement Errors in DAGs and Potential Outcomes</h1>
+<p>What are the implications of measurement error for the causal system under investigation, and how do such errors alter the assumptions on which causal identification rests? To clarify these consequences, consider the three directed acyclic graphs (DAGs) presented below.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/dag_no_error.svg" class="img-fluid figure-img" width="300"></p>
+<figcaption>(A) No Measurement Error</figcaption>
+</figure>
+</div>
+<!-- <div style=" -->
+<!--   width: 90vw; -->
+<!--   margin: 0 auto; -->
+<!--   background-color: white; -->
+<!--   padding: 1em 0; -->
+<!--   overflow-x: auto; -->
+<!-- "> -->
+<!-- <div style=" -->
+<!--   display: flex; -->
+<!--   justify-content: flex-start; -->
+<!--   text-align: center; -->
+<!--   gap: 1em; -->
+<!--   min-width: 1000px; -->
+<!-- "> -->
+<!-- <div style="flex: 0 0 auto; padding: 5px;"> -->
+<!--   <h4>(A) No Measurement Error</h4> -->
+<!--   <img src="images/dag_no_error.svg" style="width: 90%;"> -->
+<!-- </div> -->
+<!-- <div style="flex: 0 0 auto; padding: 5px;"> -->
+<!--   <h4>(B) Measurement Error in Treatment</h4> -->
+<!--   <img src="images/dag_error_in_treatment.svg" style="width: 70%;"> -->
+<!-- </div> -->
+<!-- <div style="flex: 0 0 auto; padding: 5px;"> -->
+<!--   <h4>(C) Measurement Error in Confounder</h4> -->
+<!--   <img src="images/dag_error_in_confounder.svg" style="width: 70%;"> -->
+<!-- </div> -->
+<!--   </div> -->
+<!-- </div> -->
+<p>Panel A represents the canonical scenario in which adjusting for an observed confounder <span class="math inline">\(X\)</span> is sufficient to block all backdoor paths between the treatment variable <span class="math inline">\(D\)</span> and the outcome variable <span class="math inline">\(Y\)</span>—a standard selection-on-observables case. Here, causal identification relies on the assumption that the potential outcome is conditionally independent of treatment assignment given <span class="math inline">\(X\)</span>: <span class="math inline">\(Y_{d} \indep D \mid X\)</span>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/dag_error_in_treatment.svg" class="img-fluid figure-img" width="300"></p>
+<figcaption>(B) Measurement Error in Treatment</figcaption>
+</figure>
+</div>
+<p>Panel B introduces a scenario in which the treatment variable <span class="math inline">\(D\)</span> is not directly observable. Instead, researchers only have access to a proxy or noisy measure, denoted <span class="math inline">\(D^*\)</span>. The red-colored node in the DAG emphasizes this departure. Conceptually, this reflects a situation where <span class="math inline">\(D\)</span> is a latent variable and <span class="math inline">\(D^*\)</span> is an imperfect manifestation of it. The question that arises, then, is whether the identifying assumption in terms of observable quantities still holds: namely, can we infer that <span class="math inline">\(Y_{d} \indep D^* \mid X\)</span> from our knowledge that <span class="math inline">\(Y_{d} \indep D \mid X\)</span>? The answer is not straightforward, as measurement error in the treatment variable may distort the assignment mechanism in nontrivial ways.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/dag_error_in_confounder.svg" class="img-fluid figure-img" width="350"></p>
+<figcaption>(C) Measurement Error in an Observed Confounder</figcaption>
+</figure>
+</div>
+<p>Panel C mirrors the logic of Panel B but shifts the locus of error to the confounder. Here, it is <span class="math inline">\(X\)</span> that is unobserved, with <span class="math inline">\(X^*\)</span> serving as an error-prone proxy. Although we may believe that <span class="math inline">\(Y_{d} \indep D \mid X\)</span> holds, we must now ask whether this assumption extends to the available data—that is, whether <span class="math inline">\(Y_{d} \indep D \mid X^*\)</span> is a valid identifying condition. This depends, in part, on our understanding of the measurement error generation processes—that is, the nature of the relationship between <span class="math inline">\(X\)</span> and <span class="math inline">\(X^*\)</span>.</p>
+<p>At first glance, Panels B and C may appear symmetrical in form, both involving a single measurement error pathway. However, as we will demonstrate in the following sections, even under simplified conditions—where measurement error arises from classical noise (i.e., random variance without systematic bias)—the implications for causal estimation differ markedly depending on whether the error resides in the treatment or in the confounder.</p>
+<section id="example-measurement-of-college-and-family-ses-with-proxy-variables" class="level2">
+<h2 class="anchored" data-anchor-id="example-measurement-of-college-and-family-ses-with-proxy-variables">Example: Measurement of College and Family SES with Proxy Variables</h2>
+<p>Before proceeding to more formal discussions, it is helpful to consider a concrete example that illustrates the conceptual stakes of measurement error in causal inference. Consider a simplified model of the causal effect of college on future earnings as. In this context, one’s family socioeconomic status (SES) is a plausible confounding variable, as it influences both the likelihood of attending college and subsequent income. Represented as a DAG, this setup would include arrows from SES to both college attendance and earnings.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/dag_no_error_example.svg" class="img-fluid figure-img" width="500"></p>
+<figcaption>(A) No Measurement Error</figcaption>
+</figure>
+</div>
+<p>Now consider a scenario in which the treatment variable—college education—is measured with error. Suppose the dataset includes a binary indicator, <span class="math inline">\(CollegeDegree\)</span>, denoting whether an individual obtained a degree. In a scenario where a student attended say 3 years of college but did not graduate, they would appear as untreated in the data but their exposure to college could still be influencing their future earnings. Thus, the treatment variable is measured with error. And this is identical to consdiering the following DAG as the causal system that should be considered to use to justify the assumptions.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/dag_error_in_treatment_example.svg" class="img-fluid figure-img" width="550"></p>
+<figcaption>(B) Measurement Error in Treatment</figcaption>
+</figure>
+</div>
+<p>Next, consider measurement error in the confounder. SES is notoriously difficult to define precisely and even harder to measure comprehensively. For the case wherein we can’t measure the complete items related to the SES conprehensively we can rely on the data that should be similar but not necessaryily identical with the SES, such as FAFSA (Free Application for Federal Student Aid) records, which summarize family income and assets. While FAFSA data are informative, they capture only a subset of the multidimensional construct that SES entails. In such cases, we are adjusting for <span class="math inline">\(FAFSA\)</span>, a noisy or partial representation of the true confounder. The corresponding DAG would reflect this distinction, with an arrow from latent SES to its observable proxy.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/dag_error_in_confounder_example.svg" class="img-fluid figure-img" width="550"></p>
+<figcaption>(C) Measurement Error in an Observed Confounder</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="what-happens-if-we-ignore-measurement-error" class="level1">
+<h1>What Happens If We Ignore Measurement Error?</h1>
+<p>In the domain of causal inference, the central concern with measurement error lies not in its mere existence, but in its consequences for the estimation of the causal estimand of interest. Measurement error becomes substantively meaningful only insofar as it compromises the validity or efficiency of our estimates. If the presence of such error in the treatment or in observed confounders has negligible influence on the target estimand, it may reasonably be considered a secondary issue.</p>
+<p>In what follows, we employ simple simulation exercises to explore the ramifications of ignoring measurement error—first in the treatment variable, and then in the confounders. In both cases, we restrict attention to classical measurement error, characterized by random noise rather than systematic bias. This focus allows us to examine the inferential distortions introduced by variance-based error in isolation, thereby offering an intuitive understanding of when and how such imperfections matter for causal estimation.</p>
+<section id="measurement-error-in-treatment-aka-attenuation-bias" class="level2">
+<h2 class="anchored" data-anchor-id="measurement-error-in-treatment-aka-attenuation-bias">Measurement Error in Treatment (aka Attenuation Bias)</h2>
+<p>Although stylized and somewhat removed from many empirical contexts, consider a simplified case in which the causal structure is fully captured by the direct relationship <span class="math inline">\(D \to Y\)</span>. In such a setting, where no confounding is present, merely observing the treatment variable <span class="math inline">\(D\)</span> and the outcome <span class="math inline">\(Y\)</span> is sufficient for causal identification. Researchers interested in estimating the causal effect of <span class="math inline">\(D\)</span> on <span class="math inline">\(Y\)</span> might then fit the following OLS model: <span class="math display">\[
+Y_i = \alpha + \tau D_i + \varepsilon_i,
+\]</span> where <span class="math inline">\(\tau\)</span> represents the causal estimand of interest. Now suppose, however, that the treatment variable <span class="math inline">\(D_i\)</span> is measured with error, and the researcher observes only a noisy proxy <span class="math inline">\(D_i^*\)</span>. In this case, the model estimated in practice becomes: <span class="math display">\[
+Y_i = \alpha^{\text{ep}} + \tau^{\text{ep}} D_i^* + \varepsilon_i^{\text{ep}},
+\]</span> where <span class="math inline">\(\tau^{\text{ep}}\)</span> is the coefficient obtained from regressing <span class="math inline">\(Y\)</span> on the error-prone version of the treatment. The key question is how this naive estimator <span class="math inline">\(\hat{\tau}^{\text{ep}}\)</span> compares to the true causal effect <span class="math inline">\(\tau\)</span> when the measurement error in <span class="math inline">\(D_i^*\)</span> is ignored.</p>
+<p>To illustrate this, we conduct a simulation where the true treatment effect is <span class="math inline">\(\tau = 2\)</span>, and the continuous treatment variable <span class="math inline">\(D\)</span> is measured with error such that <span class="math inline">\(D^* = D + u\)</span>, with <span class="math inline">\(u \sim \mathcal{N}(0, 1)\)</span>. Although <span class="math inline">\(D\)</span> is treated as continuous for ease of interpretation, the underlying logic holds for binary treatments as well.</p>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(<span class="st">"pacman"</span>)) <span class="fu">install.packages</span>(<span class="st">"pacman"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(tidyverse, patchwork)</span>
+<span id="cb1-3"><a href="#cb1-3"></a></span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>)</span>
+<span id="cb1-5"><a href="#cb1-5"></a></span>
+<span id="cb1-6"><a href="#cb1-6"></a>n <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb1-7"><a href="#cb1-7"></a>tau_true <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb1-8"><a href="#cb1-8"></a>sigma_d <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb1-9"><a href="#cb1-9"></a>sigma_u <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb1-10"><a href="#cb1-10"></a>sigma_eps <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb1-11"><a href="#cb1-11"></a></span>
+<span id="cb1-12"><a href="#cb1-12"></a><span class="co"># Data generation</span></span>
+<span id="cb1-13"><a href="#cb1-13"></a>D <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n, <span class="dv">0</span>, sigma_d)</span>
+<span id="cb1-14"><a href="#cb1-14"></a>u <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n, <span class="dv">0</span>, sigma_u)</span>
+<span id="cb1-15"><a href="#cb1-15"></a>D_star <span class="ot">&lt;-</span> D <span class="sc">+</span> u</span>
+<span id="cb1-16"><a href="#cb1-16"></a>eps <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n, <span class="dv">0</span>, sigma_eps)</span>
+<span id="cb1-17"><a href="#cb1-17"></a>Y <span class="ot">&lt;-</span> tau_true <span class="sc">*</span> D <span class="sc">+</span> eps</span>
+<span id="cb1-18"><a href="#cb1-18"></a></span>
+<span id="cb1-19"><a href="#cb1-19"></a><span class="co"># Create long-format data for ggplot</span></span>
+<span id="cb1-20"><a href="#cb1-20"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb1-21"><a href="#cb1-21"></a>  <span class="at">Y =</span> Y,</span>
+<span id="cb1-22"><a href="#cb1-22"></a>  <span class="at">D_true =</span> D,</span>
+<span id="cb1-23"><a href="#cb1-23"></a>  <span class="at">D_star =</span> D_star</span>
+<span id="cb1-24"><a href="#cb1-24"></a>)</span>
+<span id="cb1-25"><a href="#cb1-25"></a></span>
+<span id="cb1-26"><a href="#cb1-26"></a><span class="co"># Regression fits</span></span>
+<span id="cb1-27"><a href="#cb1-27"></a>fit_true <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y <span class="sc">~</span> D_true, <span class="at">data =</span> df)</span>
+<span id="cb1-28"><a href="#cb1-28"></a>fit_star <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y <span class="sc">~</span> D_star, <span class="at">data =</span> df)</span>
+<span id="cb1-29"><a href="#cb1-29"></a></span>
+<span id="cb1-30"><a href="#cb1-30"></a><span class="co"># Predictions for plotting regression lines</span></span>
+<span id="cb1-31"><a href="#cb1-31"></a>d_seq <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">5</span>, <span class="dv">5</span>, <span class="at">length.out =</span> <span class="dv">200</span>)</span>
+<span id="cb1-32"><a href="#cb1-32"></a>pred_true <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit_true, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">D_true =</span> d_seq))</span>
+<span id="cb1-33"><a href="#cb1-33"></a>pred_star <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit_star, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">D_star =</span> d_seq))</span>
+<span id="cb1-34"><a href="#cb1-34"></a></span>
+<span id="cb1-35"><a href="#cb1-35"></a>df_lines <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb1-36"><a href="#cb1-36"></a>  <span class="at">D =</span> d_seq,</span>
+<span id="cb1-37"><a href="#cb1-37"></a>  <span class="at">Y_true =</span> pred_true,</span>
+<span id="cb1-38"><a href="#cb1-38"></a>  <span class="at">Y_star =</span> pred_star</span>
+<span id="cb1-39"><a href="#cb1-39"></a>)</span>
+<span id="cb1-40"><a href="#cb1-40"></a></span>
+<span id="cb1-41"><a href="#cb1-41"></a><span class="co"># Plot</span></span>
+<span id="cb1-42"><a href="#cb1-42"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb1-43"><a href="#cb1-43"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> D, <span class="at">y =</span> Y), <span class="at">alpha =</span> <span class="fl">0.2</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb1-44"><a href="#cb1-44"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> D_star, <span class="at">y =</span> Y), <span class="at">alpha =</span> <span class="fl">0.2</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb1-45"><a href="#cb1-45"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> df_lines, <span class="fu">aes</span>(<span class="at">x =</span> D, <span class="at">y =</span> Y_true), <span class="at">color =</span> <span class="st">"black"</span>, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb1-46"><a href="#cb1-46"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> df_lines, <span class="fu">aes</span>(<span class="at">x =</span> D, <span class="at">y =</span> Y_star), <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb1-47"><a href="#cb1-47"></a>  <span class="fu">labs</span>(</span>
+<span id="cb1-48"><a href="#cb1-48"></a>    <span class="at">x =</span> <span class="st">"D (or D*)"</span>,</span>
+<span id="cb1-49"><a href="#cb1-49"></a>    <span class="at">y =</span> <span class="st">"Y"</span></span>
+<span id="cb1-50"><a href="#cb1-50"></a>  ) <span class="sc">+</span></span>
+<span id="cb1-51"><a href="#cb1-51"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>), <span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">5</span>, <span class="dv">5</span>)) <span class="sc">+</span></span>
+<span id="cb1-52"><a href="#cb1-52"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>), <span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">10</span>, <span class="dv">10</span>),</span>
+<span id="cb1-53"><a href="#cb1-53"></a>                     <span class="at">breaks =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">10</span>, <span class="sc">-</span><span class="fl">7.5</span>, <span class="sc">-</span><span class="dv">5</span>, <span class="sc">-</span><span class="fl">2.5</span>, <span class="dv">0</span>, <span class="fl">2.5</span>, <span class="dv">5</span>, <span class="fl">7.5</span>, <span class="dv">10</span>)) <span class="sc">+</span></span>
+<span id="cb1-54"><a href="#cb1-54"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">18</span>) <span class="sc">+</span></span>
+<span id="cb1-55"><a href="#cb1-55"></a>  <span class="fu">theme</span>(<span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>())</span>
+<span id="cb1-56"><a href="#cb1-56"></a></span>
+<span id="cb1-57"><a href="#cb1-57"></a>p</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="tutorial_files/figure-html/sim_attenuation_bias-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="384"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>In the accompanying plot, the black dots and lines represent the case where the true value of <span class="math inline">\(D\)</span> is observed, while the red points correspond to the error-prone measure <span class="math inline">\(D^*\)</span>. Due to the added noise, the red dots are more horizontally dispersed, although the vertical spread remains similar. This visualization highlights a key empirical consequence of classical measurement error in the treatment variable: it leads to a systematic underestimation of the true effect (true slope is <span class="math inline">\(2\)</span>, while the estimated slope with error-prone variable is <span class="math inline">\(1\)</span>). This pattern is commonly known as <em>attenuation bias</em>, a well-documented result in econometrics literatures <span class="citation" data-cites="wooldridge2012introductory">(<a href="#ref-wooldridge2012introductory" role="doc-biblioref">Wooldridge 2012</a>)</span>.</p>
+</section>
+<section id="measurement-error-in-an-observed-confounder" class="level2">
+<h2 class="anchored" data-anchor-id="measurement-error-in-an-observed-confounder">Measurement Error in an Observed Confounder</h2>
+<p>We now turn to the case in which measurement error arises not in the treatment variable, but in an observed confounder. In the ideal scenario—where all relevant variables are measured without error—the researcher would estimate the following OLS model: <span class="math display">\[
+Y_i = \alpha + \tau D_i + \gamma X_i + \varepsilon_i,
+\]</span> where <span class="math inline">\(D_i\)</span> is the treatment, <span class="math inline">\(X_i\)</span> is a confounder, and <span class="math inline">\(\tau\)</span> represents the causal effect of interest.</p>
+<p>However, in the presence of measurement error, we observe only an error-prone proxy <span class="math inline">\(X_i^*\)</span> rather than the true confounder <span class="math inline">\(X_i\)</span>. In that case, the estimated model becomes: <span class="math display">\[
+Y_i = \alpha^{\text{ep}} + \tau^{\text{ep}} D_i + \gamma^{\text{ep}} X_i^* + \varepsilon_i^{\text{ep}}.
+\]</span></p>
+<p>As in the previous simulation, we model the measurement error in <span class="math inline">\(X^*\)</span> using additive Gaussian noise: <span class="math inline">\(X^* = X + u\)</span>, where <span class="math inline">\(u \sim \mathcal{N}(0, 1)\)</span>. However, unlike the case of measurement error in the treatment—where the bias tends to attenuate the effect toward zero—measurement error in a confounder introduces more complex bias patterns. Specifically, the direction of the bias depends on the correlation between the treatment variable <span class="math inline">\(D\)</span> and the true confounder <span class="math inline">\(X\)</span>.</p>
+<p>To illustrate this, we set the true causal effect <span class="math inline">\(\tau\)</span> to 1 and examine two contrasting cases: one in which the treatment and the true confounder are positively correlated (<span class="math inline">\(\text{Corr}(D, X) = 0.7\)</span>), and another in which they are negatively correlated (<span class="math inline">\(\text{Corr}(D, X) = -0.7\)</span>).</p>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>)</span>
+<span id="cb2-2"><a href="#cb2-2"></a>n <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a>tau <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a>gamma <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a></span>
+<span id="cb2-6"><a href="#cb2-6"></a>simulate_case <span class="ot">&lt;-</span> <span class="cf">function</span>(cor_DX, label) {</span>
+<span id="cb2-7"><a href="#cb2-7"></a>  D <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb2-8"><a href="#cb2-8"></a>  X <span class="ot">&lt;-</span> cor_DX <span class="sc">*</span> D <span class="sc">+</span> <span class="fu">sqrt</span>(<span class="dv">1</span> <span class="sc">-</span> cor_DX<span class="sc">^</span><span class="dv">2</span>) <span class="sc">*</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb2-9"><a href="#cb2-9"></a>  X_star <span class="ot">&lt;-</span> X <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="at">sd =</span> <span class="dv">1</span>)</span>
+<span id="cb2-10"><a href="#cb2-10"></a>  Y <span class="ot">&lt;-</span> tau <span class="sc">*</span> D <span class="sc">+</span> gamma <span class="sc">*</span> X <span class="sc">+</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb2-11"><a href="#cb2-11"></a>  </span>
+<span id="cb2-12"><a href="#cb2-12"></a>  <span class="co"># Residualize D w.r.t. X and X*</span></span>
+<span id="cb2-13"><a href="#cb2-13"></a>  D_resid <span class="ot">&lt;-</span> <span class="fu">residuals</span>(<span class="fu">lm</span>(D <span class="sc">~</span> X))</span>
+<span id="cb2-14"><a href="#cb2-14"></a>  D_resid_star <span class="ot">&lt;-</span> <span class="fu">residuals</span>(<span class="fu">lm</span>(D <span class="sc">~</span> X_star))</span>
+<span id="cb2-15"><a href="#cb2-15"></a>  </span>
+<span id="cb2-16"><a href="#cb2-16"></a>  <span class="fu">data.frame</span>(D, X, X_star, Y, label, D_resid, D_resid_star)</span>
+<span id="cb2-17"><a href="#cb2-17"></a>}</span>
+<span id="cb2-18"><a href="#cb2-18"></a></span>
+<span id="cb2-19"><a href="#cb2-19"></a><span class="co"># Simulate and combine</span></span>
+<span id="cb2-20"><a href="#cb2-20"></a>df_all <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb2-21"><a href="#cb2-21"></a>  <span class="fu">simulate_case</span>(<span class="fl">0.7</span>, <span class="st">"Corr(D,X) = +0.7"</span>),</span>
+<span id="cb2-22"><a href="#cb2-22"></a>  <span class="fu">simulate_case</span>(<span class="sc">-</span><span class="fl">0.7</span>, <span class="st">"Corr(D,X) = -0.7"</span>)</span>
+<span id="cb2-23"><a href="#cb2-23"></a>)</span>
+<span id="cb2-24"><a href="#cb2-24"></a></span>
+<span id="cb2-25"><a href="#cb2-25"></a><span class="co"># Prediction line generator (uses D residualized on true X for plotting)</span></span>
+<span id="cb2-26"><a href="#cb2-26"></a>get_lines_df <span class="ot">&lt;-</span> <span class="cf">function</span>(df, label) {</span>
+<span id="cb2-27"><a href="#cb2-27"></a>  fit_true <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y <span class="sc">~</span> D <span class="sc">+</span> X, <span class="at">data =</span> df)</span>
+<span id="cb2-28"><a href="#cb2-28"></a>  fit_star <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y <span class="sc">~</span> D <span class="sc">+</span> X_star, <span class="at">data =</span> df)</span>
+<span id="cb2-29"><a href="#cb2-29"></a>  </span>
+<span id="cb2-30"><a href="#cb2-30"></a>  d_seq <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fu">min</span>(df<span class="sc">$</span>D), <span class="fu">max</span>(df<span class="sc">$</span>D), <span class="at">length.out =</span> <span class="dv">200</span>)</span>
+<span id="cb2-31"><a href="#cb2-31"></a>  x_fixed <span class="ot">&lt;-</span> <span class="fu">mean</span>(df<span class="sc">$</span>X)</span>
+<span id="cb2-32"><a href="#cb2-32"></a>  x_star_fixed <span class="ot">&lt;-</span> <span class="fu">mean</span>(df<span class="sc">$</span>X_star)</span>
+<span id="cb2-33"><a href="#cb2-33"></a>  </span>
+<span id="cb2-34"><a href="#cb2-34"></a>  pred_true <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit_true, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">D =</span> d_seq, <span class="at">X =</span> x_fixed))</span>
+<span id="cb2-35"><a href="#cb2-35"></a>  pred_star <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit_star, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">D =</span> d_seq, <span class="at">X_star =</span> x_star_fixed))</span>
+<span id="cb2-36"><a href="#cb2-36"></a>  </span>
+<span id="cb2-37"><a href="#cb2-37"></a>  d_resid_seq <span class="ot">&lt;-</span> d_seq <span class="sc">-</span> <span class="fu">mean</span>(df<span class="sc">$</span>D)</span>
+<span id="cb2-38"><a href="#cb2-38"></a>  </span>
+<span id="cb2-39"><a href="#cb2-39"></a>  <span class="fu">data.frame</span>(</span>
+<span id="cb2-40"><a href="#cb2-40"></a>    <span class="at">D_resid =</span> <span class="fu">rep</span>(d_resid_seq, <span class="dv">2</span>),</span>
+<span id="cb2-41"><a href="#cb2-41"></a>    <span class="at">Y =</span> <span class="fu">c</span>(pred_true, pred_star),</span>
+<span id="cb2-42"><a href="#cb2-42"></a>    <span class="at">Model =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"True X"</span>, <span class="st">"Measured X*"</span>), <span class="at">each =</span> <span class="fu">length</span>(d_seq)),</span>
+<span id="cb2-43"><a href="#cb2-43"></a>    <span class="at">label =</span> label</span>
+<span id="cb2-44"><a href="#cb2-44"></a>  )</span>
+<span id="cb2-45"><a href="#cb2-45"></a>}</span>
+<span id="cb2-46"><a href="#cb2-46"></a></span>
+<span id="cb2-47"><a href="#cb2-47"></a><span class="co"># Combine prediction lines</span></span>
+<span id="cb2-48"><a href="#cb2-48"></a>df_lines <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb2-49"><a href="#cb2-49"></a>  <span class="fu">get_lines_df</span>(df_all <span class="sc">|&gt;</span> <span class="fu">filter</span>(label <span class="sc">==</span> <span class="st">"Corr(D,X) = +0.7"</span>), <span class="st">"Corr(D,X) = +0.7"</span>),</span>
+<span id="cb2-50"><a href="#cb2-50"></a>  <span class="fu">get_lines_df</span>(df_all <span class="sc">|&gt;</span> <span class="fu">filter</span>(label <span class="sc">==</span> <span class="st">"Corr(D,X) = -0.7"</span>), <span class="st">"Corr(D,X) = -0.7"</span>)</span>
+<span id="cb2-51"><a href="#cb2-51"></a>)</span>
+<span id="cb2-52"><a href="#cb2-52"></a></span>
+<span id="cb2-53"><a href="#cb2-53"></a><span class="co"># Plot: black = D residualized on X; red = D residualized on X*</span></span>
+<span id="cb2-54"><a href="#cb2-54"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb2-55"><a href="#cb2-55"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> df_all, <span class="fu">aes</span>(<span class="at">x =</span> D_resid, <span class="at">y =</span> Y), <span class="at">alpha =</span> <span class="fl">0.1</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb2-56"><a href="#cb2-56"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> df_all, <span class="fu">aes</span>(<span class="at">x =</span> D_resid_star, <span class="at">y =</span> Y), <span class="at">alpha =</span> <span class="fl">0.1</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb2-57"><a href="#cb2-57"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> df_lines, <span class="fu">aes</span>(<span class="at">x =</span> D_resid, <span class="at">y =</span> Y, <span class="at">color =</span> Model, <span class="at">linetype =</span> Model), <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb2-58"><a href="#cb2-58"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> label) <span class="sc">+</span></span>
+<span id="cb2-59"><a href="#cb2-59"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"True X"</span> <span class="ot">=</span> <span class="st">"black"</span>, <span class="st">"Measured X*"</span> <span class="ot">=</span> <span class="st">"red"</span>)) <span class="sc">+</span></span>
+<span id="cb2-60"><a href="#cb2-60"></a>  <span class="fu">scale_linetype_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"True X"</span> <span class="ot">=</span> <span class="st">"solid"</span>, <span class="st">"Measured X*"</span> <span class="ot">=</span> <span class="st">"solid"</span>)) <span class="sc">+</span></span>
+<span id="cb2-61"><a href="#cb2-61"></a>  <span class="fu">labs</span>(</span>
+<span id="cb2-62"><a href="#cb2-62"></a>    <span class="at">x =</span> <span class="st">"Residualized D"</span>, <span class="at">y =</span> <span class="st">"Y"</span>, <span class="at">color =</span> <span class="cn">NULL</span>, <span class="at">linetype =</span> <span class="cn">NULL</span></span>
+<span id="cb2-63"><a href="#cb2-63"></a>  ) <span class="sc">+</span></span>
+<span id="cb2-64"><a href="#cb2-64"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>), <span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>, <span class="dv">3</span>)) <span class="sc">+</span></span>
+<span id="cb2-65"><a href="#cb2-65"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>), <span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">10</span>, <span class="dv">10</span>)) <span class="sc">+</span></span>
+<span id="cb2-66"><a href="#cb2-66"></a>  <span class="fu">coord_cartesian</span>(<span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">2.5</span>, <span class="fl">2.5</span> )) <span class="sc">+</span></span>
+<span id="cb2-67"><a href="#cb2-67"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">18</span>) <span class="sc">+</span></span>
+<span id="cb2-68"><a href="#cb2-68"></a>  <span class="fu">theme</span>(<span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb2-69"><a href="#cb2-69"></a>        <span class="at">legend.position =</span> <span class="st">"none"</span>)</span>
+<span id="cb2-70"><a href="#cb2-70"></a></span>
+<span id="cb2-71"><a href="#cb2-71"></a>p</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="tutorial_files/figure-html/sim_confounder-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="576"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The results reveal striking asymmetries. When <span class="math inline">\(D\)</span> and <span class="math inline">\(X\)</span> are negatively correlated, the estimated treatment effect is biased downward, underestimating the true effect. In contrast, when the correlation is positive, the bias shifts upward, leading to an overestimation of the effect. Notably, the measurement error process is held constant across both cases—simple additive Gaussian noise—yet its consequences for the treatment effect estimation are diametrically opposed.</p>
+</section>
+</section>
+<section id="correcting-bias-with-validation-in-a-subsample" class="level1">
+<h1>Correcting Bias with Validation in a Subsample</h1>
+<p>Although the problem of measurement error has only recently attracted renewed interest in modern causal inference frameworks, its correction has a long-standing history in related fields such as statistics, econometrics, and psychometrics—particularly within the linear modeling tradition. Broadly speaking, two classes of strategies have been developed to address this issue. The first relies on the collection of higher-quality measurements—often referred to as validation data—for a subset of the sample, which can then be used to correct bias in the larger dataset. The second strategy invokes prior knowledge or strong assumptions about the data-generating process, typically by imposing a parametric structure on the measurement error mechanism. This approach enables analytical correction or simulation-based adjustments, such as the Simulation-Extrapolation (SIMEX) method <span class="citation" data-cites="cook1994simulation">(<a href="#ref-cook1994simulation" role="doc-biblioref">Cook and Stefanski 1994</a>)</span>.</p>
+<p>In this tutorial, we focus on approaches aligned with the first strategy: those that exploit a subset of the data containing accurate measurements of either the treatment variable <span class="math inline">\(D\)</span> or the confounder <span class="math inline">\(X\)</span>, while the full dataset contains only their error-prone proxies <span class="math inline">\(D^*\)</span> or <span class="math inline">\(X^*\)</span>. To build intuition, consider a situation in which the researcher has access to precise measurements for only a small fraction of the sample. This gives rise to two extreme options: (i) conduct the analysis solely on the validated subsample, or (ii) ignore measurement error altogether and proceed with the full sample using the noisy proxies. The former yields an unbiased estimate but suffers from high variance due to limited sample size; the latter benefits from lower variance but introduces systematic bias. The central challenge, then, is to identify a principled method for using validation data that balances the trade-off between bias and variance—leveraging the advantages of both information sources.</p>
+<p>We introduce two such methods in this tutorial. The first is regression calibration <span class="citation" data-cites="carroll2006measurement">(<a href="#ref-carroll2006measurement" role="doc-biblioref">Carroll et al. 2006</a>)</span>, a classical correction technique rooted in linear regression that uses validation data to mitigate bias. The second is the control variates approach <span class="citation" data-cites="yang2020combining barnatchez2024flexible">(<a href="#ref-yang2020combining" role="doc-biblioref">Yang and Ding 2020</a>; <a href="#ref-barnatchez2024flexible" role="doc-biblioref">Barnatchez et al. 2024</a>)</span>, which provides a more flexible framework for bias reduction and precision improvement, particularly in settings that extend beyond the classical linear model.</p>
+<!-- Unlike regression calibration, this method does not require strong parametric assumptions about the measurement error process and can be integrated with modern estimators such as inverse probability weighting (IPW) or augmented inverse probability weighting (AIPW). -->
+<section id="parametric-approach-regression-calibration" class="level2">
+<h2 class="anchored" data-anchor-id="parametric-approach-regression-calibration">Parametric Approach: Regression Calibration</h2>
+<p>Regression calibration represents one of the earliest algorithmic strategies for addressing measurement error, and it remains widely utilized due to its intuitive appeal and straightforward implementation. While originally not developed within the causal inference paradigm, once causal identification is established, regression calibration may be employed for the purpose of estimating point estimates and confidence intervals, as it serves fundamentally as a method of statistical adjustment.</p>
+<p>Consider the case in which the treatment variable is measured with error:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/dag_error_in_treatment.svg" class="img-fluid quarto-figure quarto-figure-center figure-img" width="300"></p>
+</figure>
+</div>
+<p>Let us assume that for all units <span class="math inline">\(i \in \{1, 2, \ldots, N\}\)</span>, we observe the tuple <span class="math inline">\((Y_i, D_i^*, X_i, S_i)\)</span>, where <span class="math inline">\(Y_i\)</span> denotes the observed outcome, <span class="math inline">\(D_i^*\)</span> the error-prone measure of the treatment, <span class="math inline">\(X_i\)</span> a pre-treatment confounder, and <span class="math inline">\(S_i\)</span> an indicator variable signifying whether unit <span class="math inline">\(i\)</span> belongs to the validation subsample. For a subset of the sample, indexed by <span class="math inline">\(j \in \{1, 2, \ldots, n\}\)</span>, we observe not only <span class="math inline">\((Y_j, D_j^*, X_j)\)</span> but also the true treatment assignment <span class="math inline">\(D_j\)</span>, with <span class="math inline">\(S_j = 1\)</span> indicating inclusion in the validation data.</p>
+<p>We suppose the true data-generating process follows the linear model: <span class="math display">\[
+Y_i = \alpha + \tau D_i + \gamma X_i + \varepsilon_i.
+\]</span></p>
+<p>Regression calibration proceeds by first estimating the relationship between the true and error-prone variables using the validation data. Specifically, we posit a calibration model of the form: <span class="math display">\[
+D_j = h(D_j^*, X_j; \gamma) + \eta_j,
+\]</span> where <span class="math inline">\(h(D_j^*, X_j; \gamma)\)</span> is a parametric prediction function—typically a linear regression—used to approximate <span class="math inline">\(\mathbb{E}[D_j \mid D_j^*, X_j]\)</span>, and <span class="math inline">\(\eta_j\)</span> denotes a mean-zero stochastic error term.</p>
+<p>Importantly, the function <span class="math inline">\(h(\cdot)\)</span> is not assumed to recover the structural or causal relation between the mismeasured and true treatment but serves as a statistical approximation that captures the conditional expectation of the true variable given observed quantities. This model does not require strong structural assumptions—only that the validation data allow consistent estimation of the conditional mean.</p>
+<p>After estimating <span class="math inline">\(\widehat{\gamma}\)</span> from the calibration model, we impute predicted values of the true treatment for the entire sample as: <span class="math display">\[
+\widehat{D}_i = h(D_i^*, X_i; \widehat{\gamma}).
+\]</span></p>
+<p>These imputed values are then substituted in place of the unobserved <span class="math inline">\(D_i\)</span> in the main regression model: <span class="math display">\[
+Y_i = \alpha + \tau \widehat{D}_i + \gamma X_i + \varepsilon_i.
+\]</span></p>
+<p>Conceptually, this approach resembles imputation methods commonly used in missing data analysis, where the validation sample provides the necessary information for recovering latent or mismeasured variables <span class="citation" data-cites="carroll2006measurement">(<a href="#ref-carroll2006measurement" role="doc-biblioref">Carroll et al. 2006</a>)</span>.</p>
+<p>It is worth noting that this regression calibration estimator is approximately consistent for <span class="math inline">\(\tau\)</span> under classical measurement error assumptions, especially when the measurement error is nondifferential and the calibration model is correctly specified. However, it may not be fully efficient, and standard errors must be corrected (e.g., via sandwich estimators or bootstrap) to account for the uncertainty in the imputed values.</p>
+<p>The following simulation illustrates a case in which the treatment variable <span class="math inline">\(D \in \{0,1\}\)</span> is subject to classical misclassification, where the observed proxy <span class="math inline">\(D^*\)</span> is generated by randomly flipping the true value with 30% probability. The true treatment <span class="math inline">\(D\)</span> is not assigned at random but instead depends on a confounder <span class="math inline">\(X \sim \mathcal{N}(0,1)\)</span>, such that <span class="math inline">\(\mathbb{P}(D = 1 \mid X)\)</span> follows a logistic function, thereby establishing <span class="math inline">\(X\)</span> as a confounder influencing both treatment assignment and the outcome. The outcome follows the linear model <span class="math inline">\(Y = \alpha + \tau D + \gamma X + \varepsilon\)</span>, with <span class="math inline">\(\tau = 2\)</span> as the true causal effect of treatment. Because the observed treatment <span class="math inline">\(D^*\)</span> is a noisy version of <span class="math inline">\(D\)</span>, regressing <span class="math inline">\(Y\)</span> on <span class="math inline">\(D^*\)</span> and <span class="math inline">\(X\)</span> yields a biased (attenuated) estimate of <span class="math inline">\(\tau\)</span>. To address this, regression calibration uses a validation subset in which <span class="math inline">\(D\)</span> is observed to estimate a calibration model (via logistic regression) for <span class="math inline">\(\mathbb{P}(D = 1 \mid D^*, X)\)</span>, then imputes the conditional expectation <span class="math inline">\(\widehat{D} = \mathbb{E}[D \mid D^*, X]\)</span> for all units. Plugging <span class="math inline">\(\widehat{D}\)</span> into the main regression recovers an approximately unbiased estimate of <span class="math inline">\(\tau\)</span>. The simulation results show that this approach substantially corrects the attenuation bias. However, since the imputed <span class="math inline">\(\widehat{D}\)</span> is itself an estimate—based on a finite validation set—this correction introduces additional variance, leading to a slight loss of efficiency compared to the naive estimator. This highlights the classic bias-variance tradeoff inherent in regression calibration: it reduces bias at the cost of increased variability.</p>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>)</span>
+<span id="cb3-2"><a href="#cb3-2"></a></span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="co"># Parameters</span></span>
+<span id="cb3-4"><a href="#cb3-4"></a>N <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a>n_val <span class="ot">&lt;-</span> <span class="dv">200</span></span>
+<span id="cb3-6"><a href="#cb3-6"></a>B <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb3-7"><a href="#cb3-7"></a>tau <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb3-8"><a href="#cb3-8"></a>gamma <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb3-9"><a href="#cb3-9"></a>alpha <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb3-10"><a href="#cb3-10"></a>delta_0 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb3-11"><a href="#cb3-11"></a>delta_1 <span class="ot">&lt;-</span> <span class="fl">1.5</span>  <span class="co"># Strength of confounding (X -&gt; D)</span></span>
+<span id="cb3-12"><a href="#cb3-12"></a></span>
+<span id="cb3-13"><a href="#cb3-13"></a><span class="co"># Simulate data</span></span>
+<span id="cb3-14"><a href="#cb3-14"></a>X <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(N)</span>
+<span id="cb3-15"><a href="#cb3-15"></a>prob_D <span class="ot">&lt;-</span> <span class="fu">plogis</span>(delta_0 <span class="sc">+</span> delta_1 <span class="sc">*</span> X)  <span class="co"># logistic(X) for treatment probability</span></span>
+<span id="cb3-16"><a href="#cb3-16"></a>D <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(N, <span class="dv">1</span>, prob_D)                <span class="co"># True treatment influenced by X</span></span>
+<span id="cb3-17"><a href="#cb3-17"></a>Y <span class="ot">&lt;-</span> alpha <span class="sc">+</span> tau <span class="sc">*</span> D <span class="sc">+</span> gamma <span class="sc">*</span> X <span class="sc">+</span> <span class="fu">rnorm</span>(N)</span>
+<span id="cb3-18"><a href="#cb3-18"></a></span>
+<span id="cb3-19"><a href="#cb3-19"></a><span class="co"># Introduce 30% random flipping (misclassification)</span></span>
+<span id="cb3-20"><a href="#cb3-20"></a>D_star <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">runif</span>(N) <span class="sc">&lt;</span> <span class="fl">0.3</span>, <span class="dv">1</span> <span class="sc">-</span> D, D)</span>
+<span id="cb3-21"><a href="#cb3-21"></a></span>
+<span id="cb3-22"><a href="#cb3-22"></a><span class="co"># Validation indicator</span></span>
+<span id="cb3-23"><a href="#cb3-23"></a>S <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">0</span>, N)</span>
+<span id="cb3-24"><a href="#cb3-24"></a>val_idx <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span>N, n_val)</span>
+<span id="cb3-25"><a href="#cb3-25"></a>S[val_idx] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb3-26"><a href="#cb3-26"></a></span>
+<span id="cb3-27"><a href="#cb3-27"></a><span class="co"># Bootstrap storage</span></span>
+<span id="cb3-28"><a href="#cb3-28"></a>est_naive <span class="ot">&lt;-</span> <span class="fu">numeric</span>(B)</span>
+<span id="cb3-29"><a href="#cb3-29"></a>est_rc <span class="ot">&lt;-</span> <span class="fu">numeric</span>(B)</span>
+<span id="cb3-30"><a href="#cb3-30"></a></span>
+<span id="cb3-31"><a href="#cb3-31"></a><span class="cf">for</span> (b <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>B) {</span>
+<span id="cb3-32"><a href="#cb3-32"></a>  idx <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span>N, N, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb3-33"><a href="#cb3-33"></a>  </span>
+<span id="cb3-34"><a href="#cb3-34"></a>  X_b <span class="ot">&lt;-</span> X[idx]</span>
+<span id="cb3-35"><a href="#cb3-35"></a>  D_b <span class="ot">&lt;-</span> D[idx]</span>
+<span id="cb3-36"><a href="#cb3-36"></a>  D_star_b <span class="ot">&lt;-</span> D_star[idx]</span>
+<span id="cb3-37"><a href="#cb3-37"></a>  Y_b <span class="ot">&lt;-</span> Y[idx]</span>
+<span id="cb3-38"><a href="#cb3-38"></a>  S_b <span class="ot">&lt;-</span> S[idx]</span>
+<span id="cb3-39"><a href="#cb3-39"></a>  </span>
+<span id="cb3-40"><a href="#cb3-40"></a>  <span class="co"># Naive regression</span></span>
+<span id="cb3-41"><a href="#cb3-41"></a>  fit_naive <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y_b <span class="sc">~</span> D_star_b <span class="sc">+</span> X_b)</span>
+<span id="cb3-42"><a href="#cb3-42"></a>  est_naive[b] <span class="ot">&lt;-</span> <span class="fu">coef</span>(fit_naive)[<span class="st">"D_star_b"</span>]</span>
+<span id="cb3-43"><a href="#cb3-43"></a>  </span>
+<span id="cb3-44"><a href="#cb3-44"></a>  <span class="co"># Logistic regression calibration in validation sample</span></span>
+<span id="cb3-45"><a href="#cb3-45"></a>  calib_fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(D_b <span class="sc">~</span> D_star_b <span class="sc">+</span> X_b, <span class="at">subset =</span> S_b <span class="sc">==</span> <span class="dv">1</span>, <span class="at">family =</span> binomial)</span>
+<span id="cb3-46"><a href="#cb3-46"></a>  D_hat_b <span class="ot">&lt;-</span> <span class="fu">predict</span>(calib_fit, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">D_star_b =</span> D_star_b, <span class="at">X_b =</span> X_b), <span class="at">type =</span> <span class="st">"response"</span>)</span>
+<span id="cb3-47"><a href="#cb3-47"></a>  </span>
+<span id="cb3-48"><a href="#cb3-48"></a>  <span class="co"># RC regression with imputed treatment probability</span></span>
+<span id="cb3-49"><a href="#cb3-49"></a>  fit_rc <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y_b <span class="sc">~</span> D_hat_b <span class="sc">+</span> X_b)</span>
+<span id="cb3-50"><a href="#cb3-50"></a>  est_rc[b] <span class="ot">&lt;-</span> <span class="fu">coef</span>(fit_rc)[<span class="st">"D_hat_b"</span>]</span>
+<span id="cb3-51"><a href="#cb3-51"></a>}</span>
+<span id="cb3-52"><a href="#cb3-52"></a></span>
+<span id="cb3-53"><a href="#cb3-53"></a><span class="co"># Combine and plot</span></span>
+<span id="cb3-54"><a href="#cb3-54"></a>df_plot <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb3-55"><a href="#cb3-55"></a>  <span class="at">estimate =</span> <span class="fu">c</span>(est_naive, est_rc),</span>
+<span id="cb3-56"><a href="#cb3-56"></a>  <span class="at">method =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"Naive (D*)"</span>, <span class="st">"Regression Calibration"</span>), <span class="at">each =</span> B)</span>
+<span id="cb3-57"><a href="#cb3-57"></a>)</span>
+<span id="cb3-58"><a href="#cb3-58"></a></span>
+<span id="cb3-59"><a href="#cb3-59"></a><span class="co"># Plot</span></span>
+<span id="cb3-60"><a href="#cb3-60"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(df_plot, <span class="fu">aes</span>(<span class="at">x =</span> estimate, <span class="at">fill =</span> method)) <span class="sc">+</span></span>
+<span id="cb3-61"><a href="#cb3-61"></a>  <span class="fu">geom_histogram</span>(<span class="at">colour =</span> <span class="st">"white"</span>, <span class="at">bins =</span> <span class="dv">40</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">position =</span> <span class="st">"identity"</span>) <span class="sc">+</span></span>
+<span id="cb3-62"><a href="#cb3-62"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> tau, <span class="at">linetype =</span> <span class="dv">3</span>, <span class="at">size =</span> <span class="fl">1.5</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb3-63"><a href="#cb3-63"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> method, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb3-64"><a href="#cb3-64"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Estimated Treatment Effect"</span>, <span class="at">y =</span> <span class="st">"Count"</span>) <span class="sc">+</span></span>
+<span id="cb3-65"><a href="#cb3-65"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">3.5</span>)) <span class="sc">+</span></span>
+<span id="cb3-66"><a href="#cb3-66"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">18</span>) <span class="sc">+</span></span>
+<span id="cb3-67"><a href="#cb3-67"></a>  <span class="fu">theme</span>(<span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb3-68"><a href="#cb3-68"></a>        <span class="at">legend.position =</span> <span class="st">"none"</span>)</span>
+<span id="cb3-69"><a href="#cb3-69"></a></span>
+<span id="cb3-70"><a href="#cb3-70"></a>p</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="tutorial_files/figure-html/sim_reg_calibration-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="576"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="control-variates-approach" class="level2">
+<h2 class="anchored" data-anchor-id="control-variates-approach">Control Variates Approach</h2>
+<p>While regression calibration offers a simple and intuitive correction for measurement error by modeling the relationship between the mismeasured and true treatment values, its performance hinges critically on correctly specifying the calibration model and treating the imputed values as fixed in subsequent outcome estimation. This can be problematic in settings where the relationship between <span class="math inline">\(D_i^*\)</span> and <span class="math inline">\(D_i\)</span> is complex or nonlinear, or when the outcome model is itself nonlinear, such as in logistic regression. Moreover, regression calibration typically involves substituting <span class="math inline">\(\widehat{D}_i\)</span> for <span class="math inline">\(D_i\)</span> in a plug-in fashion, which may result in biased or inefficient estimates when the calibration error is substantial or when variance from the imputation step is not properly accounted for. The control variates approach, by contrast, offers a more general and robust strategy: it corrects bias and improves efficiency by combining an unbiased estimator based on the validation sample with auxiliary estimators derived from the larger, error-prone sample, without requiring strong modeling assumptions about the measurement process. Crucially, it does so in a way that directly targets the efficiency loss from validation subsampling, while maintaining the consistency of the final estimator.</p>
+<p>Consider a setting in which the treatment indicator <span class="math inline">\(D_i\)</span> is measured with error, such that we observe only a noisy proxy <span class="math inline">\(D_i^*\)</span>. However, for a subset of the sample—indexed by <span class="math inline">\(S_i = 1\)</span>—we observe the true treatment value <span class="math inline">\(D_i\)</span>. Given that <span class="math inline">\(D_i^*\)</span> is a noisy variable prone to attenuation bias, what is the most straightforward strategy for estimating the ATE in this setting?</p>
+<p>A simple approach is to restrict estimation to the validation subset for which the true treatment values <span class="math inline">\(D_i\)</span> are observed. This yields an estimate of the conditional average treatment effect among the validated units: <span class="math display">\[
+\tau_{\text{val}} = \mathbb{E}[Y_{1i} - Y_{0i} \mid S_i = 1].
+\]</span> If the validation sample is selected completely at random—formally, if <span class="math inline">\(Y_{1i}, Y_{0i}, D_i, D_i^*, X_i \indep S_i\)</span>—then this conditional estimand is equal to the population ATE: <span class="math display">\[
+\tau_{\text{val}} = \mathbb{E}[Y_{1i} - Y_{0i} \mid S_i = 1] = \mathbb{E}[Y_{1i} - Y_{0i}] = \tau.
+\]</span> In this case, <span class="math inline">\(\hat{\tau}_{\text{val}}\)</span> is an unbiased estimator for <span class="math inline">\(\tau\)</span>, i.e., <span class="math inline">\(\mathbb{E}[\hat{\tau}_{\text{val}}] = \tau\)</span>. However, relying solely on the validation subset may be inefficient, especially when the subset is small. Although unbiased, <span class="math inline">\(\hat{\tau}_{\text{val}}\)</span> may suffer from high variance, resulting in wide confidence intervals and limited inferential value.</p>
+<p>The control variates approach addresses this issue by starting with <span class="math inline">\(\hat{\tau}_{\text{val}}\)</span> and then leveraging auxiliary information from the full sample—where only the error-prone <span class="math inline">\(D_i^*\)</span> is available—to improve estimation precision. The core idea is to extract the informative component of <span class="math inline">\(D_i^*\)</span> in a way that reduces variance without introducing bias, thereby improving the asymptotic efficiency of the estimator.</p>
+<p>To formalize this, let <span class="math inline">\(\hat{\tau}_{\text{val}}\)</span> denote a consistent estimator of the ATE obtained from the validation dataset, where the true treatment <span class="math inline">\(D_i\)</span> is observed. Suppose also that we compute an error-prone estimator <span class="math inline">\(\hat{\tau}_{\text{main}}\)</span> from the full dataset using the mismeasured treatment <span class="math inline">\(D_i^*\)</span>. Although <span class="math inline">\(\hat{\tau}_{\text{main}}\)</span> is generally biased, it may still be highly correlated with <span class="math inline">\(\hat{\tau}_{\text{val}}\)</span>. The key idea, following <span class="citation" data-cites="yang2020combining">Yang and Ding (<a href="#ref-yang2020combining" role="doc-biblioref">2020</a>)</span>, is to construct an improved estimator of the form: <span class="math display">\[
+\hat{\tau}_{\text{cv}} = \hat{\tau}_{\text{val}} - \Gamma^\top V^{-1} (\hat{\tau}_{\text{val,ep}} - \hat{\tau}_{\text{main}}),
+\]</span> where <span class="math inline">\(\hat{\tau}_{\text{val,ep}}\)</span> is the error-prone estimator computed from the validation sample using only <span class="math inline">\(D_i^*\)</span>, and <span class="math inline">\(\Gamma\)</span> and <span class="math inline">\(V\)</span> are the sample covariance and variance of <span class="math inline">\((\hat{\tau}_{\text{val}}, \hat{\tau}_{\text{val,ep}} - \hat{\tau}_{\text{main}})\)</span>, respectively. Under mild regularity conditions, this estimator is consistent for the true ATE <span class="math inline">\(\tau\)</span>, and asymptotically more efficient than <span class="math inline">\(\hat{\tau}_{\text{val}}\)</span> alone. Crucially, this result does not rely on <span class="math inline">\(\hat{\tau}_{\text{main}}\)</span> or <span class="math inline">\(\hat{\tau}_{\text{val,ep}}\)</span> being consistent for <span class="math inline">\(\tau\)</span>; it only requires that they converge to the same finite limit, which is typically satisfied when both estimators are derived from the same estimation procedure applied to <span class="math inline">\(D_i^*\)</span> and <span class="math inline">\(X_i\)</span>. In this way, the proposed control variates estimator leverages the stability and efficiency of <span class="math inline">\(\hat{\tau}_{\text{main}}\)</span> to reduce the variance of the unbiased but potentially noisy <span class="math inline">\(\hat{\tau}_{\text{val}}\)</span>. This approach generalizes beyond linear regression and can be applied to a wide class of asymptotically linear estimators, including inverse probability weighting and augmented estimators, as long as the difference <span class="math inline">\((\hat{\tau}_{\text{val,ep}} - \hat{\tau}_{\text{main}})\)</span> is estimable and asymptotically negligible.</p>
+<p>We simulate a setting where the binary treatment variable is measured with error, and a small fraction of the data includes validation information containing the true treatment status. Covariates <span class="math inline">\(X_1, X_2 \sim \mathcal{N}(0,1)\)</span> determine the true treatment <span class="math inline">\(D\)</span> via a logistic model, and the observed treatment <span class="math inline">\(D^*\)</span> is generated by flipping <span class="math inline">\(D\)</span> with probability <span class="math inline">\(15\%\)</span>. Potential outcomes are nonlinear functions of the covariates, and the true ATE is set to <span class="math inline">\(2\)</span>. We compare three estimators: (i) a estimator that fits a linear regression using only the validated subset; (ii) an estimator that uses the full sample but relies on the misclassified treatment <span class="math inline">\(D^*\)</span>; and (iii) a estimator that corrects the validation-only estimate by leveraging the discrepancy between the error-prone estimates in the full and validation samples. The simulation shows that the error-prone estimator exhibits clear attenuation bias despite its low variance. In contrast, both the validation-only and control variates estimators are approximately unbiased. Importantly, the control variates estimator consistently achieves lower variance than the validation-only estimator across all validation fractions, thereby demonstrating that incorporating auxiliary information from the error-prone full sample—while correcting for its bias—can yield a more efficient yet still unbiased estimate.</p>
+<div class="cell" data-layout-align="center">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>)</span>
+<span id="cb4-2"><a href="#cb4-2"></a></span>
+<span id="cb4-3"><a href="#cb4-3"></a>simulate_once <span class="ot">&lt;-</span> <span class="cf">function</span>(n, val_frac, <span class="at">misclass_rate =</span> <span class="fl">0.15</span>) {</span>
+<span id="cb4-4"><a href="#cb4-4"></a>  X1 <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb4-5"><a href="#cb4-5"></a>  X2 <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb4-6"><a href="#cb4-6"></a>  p <span class="ot">&lt;-</span> <span class="fu">plogis</span>(X1 <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> X2)</span>
+<span id="cb4-7"><a href="#cb4-7"></a>  D <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, p)</span>
+<span id="cb4-8"><a href="#cb4-8"></a>  D_star <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">runif</span>(n) <span class="sc">&lt;</span> misclass_rate, <span class="dv">1</span> <span class="sc">-</span> D, D)</span>
+<span id="cb4-9"><a href="#cb4-9"></a>  </span>
+<span id="cb4-10"><a href="#cb4-10"></a>  <span class="co"># Define potential outcomes</span></span>
+<span id="cb4-11"><a href="#cb4-11"></a>  Y0 <span class="ot">&lt;-</span> <span class="fu">exp</span>(X1) <span class="sc">/</span> <span class="dv">4</span> <span class="sc">+</span> <span class="fu">sin</span>(<span class="dv">2</span> <span class="sc">*</span> X2) <span class="sc">+</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb4-12"><a href="#cb4-12"></a>  Y1 <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">+</span> <span class="fu">exp</span>(X1) <span class="sc">/</span> <span class="dv">4</span> <span class="sc">+</span> <span class="fu">sin</span>(<span class="dv">2</span> <span class="sc">*</span> X2) <span class="sc">+</span> <span class="fu">rnorm</span>(n)  <span class="co"># add ATE = 2</span></span>
+<span id="cb4-13"><a href="#cb4-13"></a>  </span>
+<span id="cb4-14"><a href="#cb4-14"></a>  <span class="co"># Reveal observed outcome</span></span>
+<span id="cb4-15"><a href="#cb4-15"></a>  Y <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(D <span class="sc">==</span> <span class="dv">1</span>, Y1, Y0)</span>
+<span id="cb4-16"><a href="#cb4-16"></a>  </span>
+<span id="cb4-17"><a href="#cb4-17"></a>  <span class="co"># Validation indicator</span></span>
+<span id="cb4-18"><a href="#cb4-18"></a>  S <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">0</span>, n)</span>
+<span id="cb4-19"><a href="#cb4-19"></a>  S[<span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span>n, <span class="at">size =</span> n <span class="sc">*</span> val_frac)] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb4-20"><a href="#cb4-20"></a>  </span>
+<span id="cb4-21"><a href="#cb4-21"></a>  df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(Y, D, D_star, X1, X2, S)</span>
+<span id="cb4-22"><a href="#cb4-22"></a>  </span>
+<span id="cb4-23"><a href="#cb4-23"></a>  tau_val <span class="ot">&lt;-</span> <span class="fu">coef</span>(<span class="fu">lm</span>(Y <span class="sc">~</span> D <span class="sc">+</span> X1 <span class="sc">+</span> X2, <span class="at">data =</span> df <span class="sc">|&gt;</span> <span class="fu">filter</span>(S <span class="sc">==</span> <span class="dv">1</span>)))[<span class="st">"D"</span>]</span>
+<span id="cb4-24"><a href="#cb4-24"></a>  tau_ep_main <span class="ot">&lt;-</span> <span class="fu">coef</span>(<span class="fu">lm</span>(Y <span class="sc">~</span> D_star <span class="sc">+</span> X1 <span class="sc">+</span> X2, <span class="at">data =</span> df))[<span class="st">"D_star"</span>]</span>
+<span id="cb4-25"><a href="#cb4-25"></a>  tau_ep_val <span class="ot">&lt;-</span> <span class="fu">coef</span>(<span class="fu">lm</span>(Y <span class="sc">~</span> D_star <span class="sc">+</span> X1 <span class="sc">+</span> X2, <span class="at">data =</span> df <span class="sc">|&gt;</span> <span class="fu">filter</span>(S <span class="sc">==</span> <span class="dv">1</span>)))[<span class="st">"D_star"</span>]</span>
+<span id="cb4-26"><a href="#cb4-26"></a>  </span>
+<span id="cb4-27"><a href="#cb4-27"></a>  <span class="fu">setNames</span>(<span class="fu">c</span>(tau_val, tau_ep_main, tau_ep_val),</span>
+<span id="cb4-28"><a href="#cb4-28"></a>           <span class="fu">c</span>(<span class="st">"tau_val"</span>, <span class="st">"tau_ep_main"</span>, <span class="st">"tau_ep_val"</span>))</span>
+<span id="cb4-29"><a href="#cb4-29"></a>}</span>
+<span id="cb4-30"><a href="#cb4-30"></a></span>
+<span id="cb4-31"><a href="#cb4-31"></a><span class="co"># Settings</span></span>
+<span id="cb4-32"><a href="#cb4-32"></a>n <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb4-33"><a href="#cb4-33"></a>val_fracs <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="at">by =</span> <span class="fl">0.1</span>)</span>
+<span id="cb4-34"><a href="#cb4-34"></a>n_sim <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb4-35"><a href="#cb4-35"></a>true_tau <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb4-36"><a href="#cb4-36"></a></span>
+<span id="cb4-37"><a href="#cb4-37"></a><span class="co"># Run and collect full simulation results</span></span>
+<span id="cb4-38"><a href="#cb4-38"></a>all_sims <span class="ot">&lt;-</span> <span class="fu">lapply</span>(val_fracs, <span class="cf">function</span>(vf) {</span>
+<span id="cb4-39"><a href="#cb4-39"></a>  sims <span class="ot">&lt;-</span> <span class="fu">replicate</span>(n_sim, <span class="fu">simulate_once</span>(n, vf), <span class="at">simplify =</span> <span class="st">"matrix"</span>)</span>
+<span id="cb4-40"><a href="#cb4-40"></a>  </span>
+<span id="cb4-41"><a href="#cb4-41"></a>  tau_val_vec <span class="ot">&lt;-</span> sims[<span class="st">"tau_val"</span>, ]</span>
+<span id="cb4-42"><a href="#cb4-42"></a>  tau_ep_main_vec <span class="ot">&lt;-</span> sims[<span class="st">"tau_ep_main"</span>, ]</span>
+<span id="cb4-43"><a href="#cb4-43"></a>  tau_ep_val_vec <span class="ot">&lt;-</span> sims[<span class="st">"tau_ep_val"</span>, ]</span>
+<span id="cb4-44"><a href="#cb4-44"></a>  control_variate <span class="ot">&lt;-</span> tau_ep_val_vec <span class="sc">-</span> tau_ep_main_vec</span>
+<span id="cb4-45"><a href="#cb4-45"></a>  b_hat <span class="ot">&lt;-</span> <span class="fu">cov</span>(tau_val_vec, control_variate) <span class="sc">/</span> <span class="fu">var</span>(control_variate)</span>
+<span id="cb4-46"><a href="#cb4-46"></a>  tau_cv_vec <span class="ot">&lt;-</span> tau_val_vec <span class="sc">-</span> b_hat <span class="sc">*</span> control_variate</span>
+<span id="cb4-47"><a href="#cb4-47"></a>  </span>
+<span id="cb4-48"><a href="#cb4-48"></a>  <span class="fu">data.frame</span>(</span>
+<span id="cb4-49"><a href="#cb4-49"></a>    <span class="at">val_frac =</span> vf,</span>
+<span id="cb4-50"><a href="#cb4-50"></a>    <span class="at">validation_only =</span> tau_val_vec,</span>
+<span id="cb4-51"><a href="#cb4-51"></a>    <span class="at">error_prone_main =</span> tau_ep_main_vec,</span>
+<span id="cb4-52"><a href="#cb4-52"></a>    <span class="at">control_variates =</span> tau_cv_vec</span>
+<span id="cb4-53"><a href="#cb4-53"></a>  )</span>
+<span id="cb4-54"><a href="#cb4-54"></a>})</span>
+<span id="cb4-55"><a href="#cb4-55"></a></span>
+<span id="cb4-56"><a href="#cb4-56"></a><span class="co"># Reshape to long format</span></span>
+<span id="cb4-57"><a href="#cb4-57"></a>all_sims_df <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(all_sims) <span class="sc">|&gt;</span></span>
+<span id="cb4-58"><a href="#cb4-58"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(<span class="st">"validation_only"</span>, <span class="st">"error_prone_main"</span>, <span class="st">"control_variates"</span>),</span>
+<span id="cb4-59"><a href="#cb4-59"></a>               <span class="at">names_to =</span> <span class="st">"estimator"</span>, <span class="at">values_to =</span> <span class="st">"estimate"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb4-60"><a href="#cb4-60"></a>  <span class="fu">mutate</span>(<span class="at">bias =</span> estimate <span class="sc">-</span> true_tau)</span>
+<span id="cb4-61"><a href="#cb4-61"></a></span>
+<span id="cb4-62"><a href="#cb4-62"></a>bias_summary <span class="ot">&lt;-</span> all_sims_df <span class="sc">|&gt;</span></span>
+<span id="cb4-63"><a href="#cb4-63"></a>  <span class="fu">group_by</span>(val_frac, estimator) <span class="sc">|&gt;</span></span>
+<span id="cb4-64"><a href="#cb4-64"></a>  <span class="fu">summarise</span>(<span class="at">bias =</span> <span class="fu">mean</span>(bias), <span class="at">variance =</span> <span class="fu">var</span>(estimate), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb4-65"><a href="#cb4-65"></a>  <span class="fu">mutate</span>(<span class="at">RMSE =</span> <span class="fu">sqrt</span>(bias<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> variance)) <span class="sc">|&gt;</span> </span>
+<span id="cb4-66"><a href="#cb4-66"></a>  <span class="fu">mutate</span>(<span class="at">estimator =</span> <span class="fu">factor</span>(estimator, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"control_variates"</span>, <span class="st">"validation_only"</span>, <span class="st">"error_prone_main"</span>))) <span class="sc">|&gt;</span></span>
+<span id="cb4-67"><a href="#cb4-67"></a>  <span class="fu">mutate</span>(<span class="at">estimator =</span> <span class="fu">recode</span>(estimator, </span>
+<span id="cb4-68"><a href="#cb4-68"></a>                            <span class="at">validation_only =</span> <span class="st">"Validation Only"</span>,</span>
+<span id="cb4-69"><a href="#cb4-69"></a>                            <span class="at">error_prone_main =</span> <span class="st">"Error-Prone Main"</span>,</span>
+<span id="cb4-70"><a href="#cb4-70"></a>                            <span class="at">control_variates =</span> <span class="st">"Control Variates"</span>))</span>
+<span id="cb4-71"><a href="#cb4-71"></a></span>
+<span id="cb4-72"><a href="#cb4-72"></a></span>
+<span id="cb4-73"><a href="#cb4-73"></a><span class="co"># Create plots</span></span>
+<span id="cb4-74"><a href="#cb4-74"></a>p1 <span class="ot">&lt;-</span> bias_summary <span class="sc">|&gt;</span> </span>
+<span id="cb4-75"><a href="#cb4-75"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> val_frac, <span class="at">y =</span> bias, <span class="at">color =</span> estimator, <span class="at">shape =</span> estimator)) <span class="sc">+</span></span>
+<span id="cb4-76"><a href="#cb4-76"></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> .<span class="dv">5</span>) <span class="sc">+</span></span>
+<span id="cb4-77"><a href="#cb4-77"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb4-78"><a href="#cb4-78"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">18</span>) <span class="sc">+</span></span>
+<span id="cb4-79"><a href="#cb4-79"></a>  <span class="fu">theme</span>(<span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span></span>
+<span id="cb4-80"><a href="#cb4-80"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Validation sample fraction"</span>, <span class="at">y =</span> <span class="st">"Bias"</span>, <span class="at">color =</span> <span class="cn">NULL</span>, <span class="at">shape =</span> <span class="cn">NULL</span>)</span>
+<span id="cb4-81"><a href="#cb4-81"></a></span>
+<span id="cb4-82"><a href="#cb4-82"></a>p2 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(bias_summary, <span class="fu">aes</span>(<span class="at">x =</span> val_frac, <span class="at">y =</span> variance, <span class="at">color =</span> estimator, <span class="at">shape =</span> estimator)) <span class="sc">+</span></span>
+<span id="cb4-83"><a href="#cb4-83"></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> .<span class="dv">5</span>) <span class="sc">+</span></span>
+<span id="cb4-84"><a href="#cb4-84"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb4-85"><a href="#cb4-85"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">18</span>) <span class="sc">+</span></span>
+<span id="cb4-86"><a href="#cb4-86"></a>  <span class="fu">theme</span>(<span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span></span>
+<span id="cb4-87"><a href="#cb4-87"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Validation sample fraction"</span>, <span class="at">y =</span> <span class="st">"Variance"</span>, <span class="at">color =</span> <span class="cn">NULL</span>, <span class="at">shape =</span> <span class="cn">NULL</span>)</span>
+<span id="cb4-88"><a href="#cb4-88"></a></span>
+<span id="cb4-89"><a href="#cb4-89"></a><span class="co"># Combine with shared legend</span></span>
+<span id="cb4-90"><a href="#cb4-90"></a>p <span class="ot">&lt;-</span> (p1 <span class="sc">|</span> p2) <span class="sc">+</span> </span>
+<span id="cb4-91"><a href="#cb4-91"></a>  <span class="fu">plot_layout</span>(<span class="at">guides =</span> <span class="st">"collect"</span>) <span class="sc">&amp;</span> </span>
+<span id="cb4-92"><a href="#cb4-92"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span>
+<span id="cb4-93"><a href="#cb4-93"></a></span>
+<span id="cb4-94"><a href="#cb4-94"></a>p</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="tutorial_files/figure-html/simulation_control_variates-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+
+
+
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-barnatchez2024flexible" class="csl-entry" role="listitem">
+Barnatchez, Keith, Rachel Nethery, Bryan E. Shepherd, Giovanni Parmigiani, and Kevin P. Josey. 2024. <span>“Flexible and <span>Efficient</span> <span>Estimation</span> of <span>Causal</span> <span>Effects</span> with <span>Error</span>-<span>Prone</span> <span>Exposures</span>: <span>A</span> <span>Control</span> <span>Variates</span> <span>Approach</span> for <span>Measurement</span> <span>Error</span>.”</span> <em>arXiv</em>. <a href="https://arxiv.org/abs/2410.12590">https://arxiv.org/abs/2410.12590</a>.
+</div>
+<div id="ref-carroll2006measurement" class="csl-entry" role="listitem">
+Carroll, Raymond J, David Ruppert, Leonard A Stefanski, and Ciprian M Crainiceanu. 2006. <em>Measurement Error in Nonlinear Models: A Modern Perspective</em>. Chapman; Hall/CRC.
+</div>
+<div id="ref-cook1994simulation" class="csl-entry" role="listitem">
+Cook, John R, and Leonard A Stefanski. 1994. <span>“Simulation-Extrapolation Estimation in Parametric Measurement Error Models.”</span> <em>Journal of the American Statistical Association</em> 89 (428): 1314–28. <a href="https://doi.org/10.1080/01621459.1994.10476871">https://doi.org/10.1080/01621459.1994.10476871</a>.
+</div>
+<div id="ref-wooldridge2012introductory" class="csl-entry" role="listitem">
+Wooldridge, Jeffrey M. 2012. <em>Introductory Econometrics: A Modern Approach</em>. 5th ed. Mason, OH: South-Western Cengage Learning.
+</div>
+<div id="ref-yang2020combining" class="csl-entry" role="listitem">
+Yang, Shu, and Peng Ding. 2020. <span>“Combining Multiple Observational Data Sources to Estimate Causal Effects.”</span> <em>Journal of the American Statistical Association</em> 115 (531): 1540–44. <a href="https://doi.org/10.1080/01621459.2019.1609973">https://doi.org/10.1080/01621459.2019.1609973</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
