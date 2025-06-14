@@ -161,9 +161,12 @@ df_lines <- data.frame(
   Y_true = pred_true,
   Y_star = pred_star
 )
+```
 
+
+```{r sim_attenuation_bias2}
 # Plot
-p <- ggplot() +
+ggplot() +
   geom_point(aes(x = D, y = Y), alpha = 0.2, color = "black") +
   geom_point(aes(x = D_star, y = Y), alpha = 0.2, color = "red") +
   geom_line(data = df_lines, aes(x = D, y = Y_true), color = "black", size = 2) +
@@ -177,8 +180,6 @@ p <- ggplot() +
                      breaks = c(-10, -7.5, -5, -2.5, 0, 2.5, 5, 7.5, 10)) +
   theme_bw(base_size = 18) +
   theme(panel.grid.minor = element_blank())
-
-print(p)
 ```
 
 In the accompanying plot, the black dots and lines represent the case where the true value of $D$ is observed, while the red points correspond to the error-prone measure $D^*$. Due to the added noise, the red dots are more horizontally dispersed, although the vertical spread remains similar. This visualization highlights a key empirical consequence of classical measurement error in the treatment variable: it leads to a systematic underestimation of the true effect (true slope is $2$, while the estimated slope with error-prone variable is $1$). This pattern is commonly known as *attenuation bias*, a well-documented result in econometrics literatures [@wooldridge2012introductory].
