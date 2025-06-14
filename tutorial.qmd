@@ -8,256 +8,530 @@ date: today
 
 # Introduction
 
+In efforts to draw causal inferences from empirical data, researchers routinely address methodological challenges such as unobserved confounding, selection bias, and post-treatment variables. Yet, the problem of measurement error---particularly in key covariates or treatment variables---remains comparatively underexamined. Even when investigators include all theoretically relevant and observable confounders in their analytic models, the presence of measurement error compromises the validity of such adjustments. A covariate measured imprecisely no longer serves as a reliable control; rather, it behaves as if partially unobserved, thereby reintroducing bias into the causal estimation process. In this sense, the reliability of measurement serves not merely as a technical detail, but as a conceptual bridge between observed and unobserved confounding: the lower the reliability, the greater the extent to which measured covariates recede into the background as effectively unmeasured sources of bias.
+
+Measurement error is an endemic feature of empirical work. Researchers often rely on imprecise instruments---be it due to respondent misreporting, interviewer error, or limitations of the survey instrument itself. For example, demographic variables may be inaccurately recorded through careless administration, proxy measures may be used for constructs that are difficult or impossible to observe directly, or the target variable is inherently latent, such as depressive symptoms or political ideology, and thus intrinsically noisy even under ideal measurement conditions.
+
+This tutorial pursues two objectives. First, through a series of simple simulations, we demonstrate the consequences of measurement error in covariates and treatment variables on causal effect estimation. We show how such errors bias the target estimand and undermine standard analytic procedures. Second, we introduce two widely applicable adjustment strategies---regression calibration and control variates---that leverage validation subsamples containing accurate measurements. These techniques offer practical tools for mitigating the deleterious effects of measurement error and restoring inferential credibility.
+
+
 ## Notations
 
-Throughout this tutorial, we adopt the following notation consistently. Let $D_i$ denote the treatment assignment status for unit $i$, where $d \in \{0, 1\}$ in the case of a binary treatment, though the framework can be extended to settings with multiple or continuous treatment levels. Let $Y_{di}$ represent the potential outcome for unit $i$ under treatment condition $d$. When the treatment is binary, the observed outcome for unit $i$ is given by the standard switching equation: $Y_i = D_i Y_{1i} + (1 - D_i) Y_{0i}$. We denote observed confounders using $X_i$ for a single variable, and $\textbf{X}_i$ for a row vector of multiple confounders for unit $i$. To indicate error-prone or proxy measures, we append an asterisk to the variable name. For example, $X_i^*$ denotes a noisy or proxy measure of $X_i$, and $D_i^*$ denotes a mismeasured/noisy/proxy version of the treatment variable $D_i$.
+Throughout this tutorial, we adhere to a consistent notational convention. Let $D_i$ denote the treatment assignment for unit $i$, where $d \in {0, 1}$ in the binary case. While our discussion centers on binary treatments, the analytical framework extends in a straightforward manner to settings involving multi-valued or continuous treatments. The potential outcome corresponding to treatment level $d$ for unit $i$ is denoted by $Y_{di}$. Under a binary treatment regime, the observed outcome follows the canonical switching equation:
+$Y_i = D_i Y_{1i} + (1 - D_i) Y_{0i}$.
 
-## Measurement Errors in DAGs and Potential Outcomes
+We represent observed covariates by $X_i$ in the univariate case, and by $\textbf{X}_i$ when referring to a vector of pre-treatment characteristics for unit $i$. To distinguish true values from their imperfect or proxy counterparts, we adopt the conventional notation of appending an asterisk. Accordingly, $X_i^*$ denotes a noisy or error-prone measurement of $X_i$, and $D_i^*$ refers to a mismeasured or surrogate version of the treatment variable $D_i$.
 
-### No Measurement Error
-=======
-An often unstated assumption in causal inference is that all variables are measured without error; however, in practice measurement error can exist in any/all variables including observed confounders, treatment, and even outcome variables. This error can be due to noise, bias, or limitations in measurement instruments. For the sake of causal inference, we are not interested in the measurement error per se, but rather its effect on our causal assumptions and the downstream effect on the treatment estimate.
+Finally, in empirical contexts where validation subsamples are available---that is, subsets of the data for which gold-standard measurements of treatment or covariates are obtained---we define an indicator variable $S_i$, such that $S_i = 1$ if unit $i$ is included in the validation sample, and $S_i = 0$ otherwise.
 
-In this tutorial we first model measurement error in the language of DAGs and potential outcomes. We then use Monte Carlo simulations to demonstrate what happens when measurement error is ignored in the treatment and observed confounder variables (we do not cover error in outcome variables). Finally, we will discuss methods for addressing this measurement error. We demonstrate direct correction/adjustment, regression calibration, control variates, and sensitivity analysis.
+# Measurement Errors in DAGs and Potential Outcomes
 
-## A concrete example for understanding measurement error
+What are the implications of measurement error for the causal system under investigation, and how do such errors alter the assumptions on which causal identification rests? To clarify these consequences, consider the three directed acyclic graphs (DAGs) presented below.
 
-We will consider a simplified model of the causal effect of college on future earnings as a running example throughout this tutorial. You can imagine that one's family socioeconomic status (SES) is a confounding variable that affects both your going to college and your future earnings. In DAG form this looks like: 
-
-![](images/dag_college_future_earnings.svg){fig-align="center" width=60%}
+![(A) No Measurement Error](images/dag_no_error.svg){fig-align="center" width=300px}
 
 
-# Measurement Error in the language of DAGs and Potential Outcomes
-
-Throughout this tutorial, we adopt the following notation consistently:
-
-- Let $D_i$ denote the treatment assignment status for unit $i$, where $d \in \{0, 1\}$ in the case of a binary treatment, though the framework can be extended to settings with multiple or continuous treatment levels
-- Let $Y_{di}$ represent the potential outcome for unit $i$ under treatment condition $d$. When the treatment is binary, the observed outcome for unit $i$ is given by the standard switching equation: $Y_i = D_i Y_{1i} + (1 - D_i) Y_{0i}$
-- We denote observed confounders using $X_i$ for a single variable, and $\textbf{X}_i$ for a row vector of multiple confounders for unit $i$
-- To indicate error-prone or proxy measures, we append an asterisk to the variable name. For example, $X_i^*$ denotes a noisy or proxy measure of $X_i$, and $D_i^*$ denotes a mismeasured/noisy/proxy version of the treatment variable $D_i$
-
-## No Measurement Error
-
-![](images/dag_no_error.svg){fig-align="center" width=40%}
-
-- $X$ is an observed confounder
-- Identification assumption: $Y_d \indep D \mid X$
-=======
-
-## Measurement Error in Treatment Variable
-
-![](images/dag_error_in_treatment.svg){fig-align="center" width=40%}
-
-- We cannot observe $D$ directly; instead, we observe $D^*$ (a descendant of $D$)
-- $D^*$ is a proxy or noisy measurement of $D$
-- Even if $Y_d \indep D \mid X$, identification via $D^*$ is not guaranteed: Does $Y_d \indep D^* \mid X$ hold?
-=======
-
-Returning to our example of the effect of college on future earnings, say your dataset includes the indicator variable $CollegeDegree$ for whether or not an individual obtained a degree. In a scenario where a student attended say 3 years of college but did not graduate, they would appear as untreated in your data but their exposure to college could still be influencing their future earnings. Thus, your treatment variable is measured with error.
-
-![](images/dag_error_in_college.svg){fig-align="center" width=60%}
-
-## Measurement Error in Observed Confounder
-
-![](images/dag_error_in_confounder.svg){fig-align="center" width=40%}
-
-- We cannot observe $X$ directly; instead, we observe $X^*$ (a descendant of $X$)
-- $X^*$ is a proxy or noisy measurement of $X$
-- Even if we know that $Y_d \perp\!\!\!\perp D \mid X$, identification using $X^*$ is not guaranteed: $Y_d \not\!\!\perp\!\!\!\perp D  \mid X^*$
-=======
-
-Again, returning to our example of the effect of college on future earnings, our confounder SES is difficult to define and even harder to measure. Let's say our dataset contains students' FAFSA data as a noisy proxy for SES (financial aid application summarizing family income and assets), our DAG would look something like:
-
-![](images/dag_error_in_ses.svg){fig-align="center" width=60%}
 
 
-# What happens if we ignore measurement error?
 
-This section uses Monte Carlo simulations to demonstrate the implications of ignoring measurement error in your treatment and confounder variables.
+<!-- <div style=" -->
+<!--   width: 90vw; -->
+<!--   margin: 0 auto; -->
+<!--   background-color: white; -->
+<!--   padding: 1em 0; -->
+<!--   overflow-x: auto; -->
+<!-- "> -->
 
-## Error in treatment
+<!-- <div style=" -->
+<!--   display: flex; -->
+<!--   justify-content: flex-start; -->
+<!--   text-align: center; -->
+<!--   gap: 1em; -->
+<!--   min-width: 1000px; -->
+<!-- "> -->
 
-In the scenario where our treatment variable is measured with error, we would like to estimate,
+<!-- <div style="flex: 0 0 auto; padding: 5px;"> -->
+<!--   <h4>(A) No Measurement Error</h4> -->
+<!--   <img src="images/dag_no_error.svg" style="width: 90%;"> -->
+<!-- </div> -->
 
+<!-- <div style="flex: 0 0 auto; padding: 5px;"> -->
+<!--   <h4>(B) Measurement Error in Treatment</h4> -->
+<!--   <img src="images/dag_error_in_treatment.svg" style="width: 70%;"> -->
+<!-- </div> -->
+
+<!-- <div style="flex: 0 0 auto; padding: 5px;"> -->
+<!--   <h4>(C) Measurement Error in Confounder</h4> -->
+<!--   <img src="images/dag_error_in_confounder.svg" style="width: 70%;"> -->
+<!-- </div> -->
+
+<!--   </div> -->
+<!-- </div> -->
+
+Panel A represents the canonical scenario in which adjusting for an observed confounder $X$ is sufficient to block all backdoor paths between the treatment variable $D$ and the outcome variable $Y$---a standard selection-on-observables case. Here, causal identification relies on the assumption that the potential outcome is conditionally independent of treatment assignment given $X$: $Y_{d} \indep D \mid X$.
+
+
+![(B) Measurement Error in Treatment](images/dag_error_in_treatment.svg){fig-align="center" width=300px}
+
+
+
+Panel B introduces a scenario in which the treatment variable $D$ is not directly observable. Instead, researchers only have access to a proxy or noisy measure, denoted $D^*$. The red-colored node in the DAG emphasizes this departure. Conceptually, this reflects a situation where $D$ is a latent variable and $D^*$ is an imperfect manifestation of it. The question that arises, then, is whether the identifying assumption in terms of observable quantities still holds: namely, can we infer that $Y_{d} \indep D^* \mid X$ from our knowledge that $Y_{d} \indep D \mid X$? The answer is not straightforward, as measurement error in the treatment variable may distort the assignment mechanism in nontrivial ways.
+
+![(C) Measurement Error in an Observed Confounder](images/dag_error_in_confounder.svg){fig-align="center" width=350px}
+
+Panel C mirrors the logic of Panel B but shifts the locus of error to the confounder. Here, it is $X$ that is unobserved, with $X^*$ serving as an error-prone proxy. Although we may believe that $Y_{d} \indep D \mid X$ holds, we must now ask whether this assumption extends to the available data---that is, whether $Y_{d} \indep D \mid X^*$ is a valid identifying condition. This depends, in part, on our understanding of the measurement error generation processes---that is, the nature of the relationship between $X$ and $X^*$.
+
+At first glance, Panels B and C may appear symmetrical in form, both involving a single measurement error pathway. However, as we will demonstrate in the following sections, even under simplified conditions---where measurement error arises from classical noise (i.e., random variance without systematic bias)---the implications for causal estimation differ markedly depending on whether the error resides in the treatment or in the confounder.
+
+## Example: Measurement of College and Family SES with Proxy Variables
+
+Before proceeding to more formal discussions, it is helpful to consider a concrete example that illustrates the conceptual stakes of measurement error in causal inference. Consider a simplified model of the causal effect of college on future earnings as. In this context, one’s family socioeconomic status (SES) is a plausible confounding variable, as it influences both the likelihood of attending college and subsequent income. Represented as a DAG, this setup would include arrows from SES to both college attendance and earnings.
+
+![(A) No Measurement Error](images/dag_no_error_example.svg){fig-align="center" width=500px}
+
+Now consider a scenario in which the treatment variable---college education---is measured with error. Suppose the dataset includes a binary indicator, $CollegeDegree$, denoting whether an individual obtained a degree. In a scenario where a student attended say 3 years of college but did not graduate, they would appear as untreated in the data but their exposure to college could still be influencing their future earnings. Thus, the treatment variable is measured with error. And this is identical to consdiering the following DAG as the causal system that should be considered to use to justify the assumptions.
+
+![(B) Measurement Error in Treatment](images/dag_error_in_treatment_example.svg){fig-align="center" width=550px}
+
+Next, consider measurement error in the confounder. SES is notoriously difficult to define precisely and even harder to measure comprehensively. For the case wherein we can't measure the complete items related to the SES conprehensively we can rely on the data that should be similar but not necessaryily identical with the SES, such as FAFSA (Free Application for Federal Student Aid) records, which summarize family income and assets. While FAFSA data are informative, they capture only a subset of the multidimensional construct that SES entails. In such cases, we are adjusting for $FAFSA$, a noisy or partial representation of the true confounder. The corresponding DAG would reflect this distinction, with an arrow from latent SES to its observable proxy.
+
+![(C) Measurement Error in an Observed Confounder](images/dag_error_in_confounder_example.svg){fig-align="center" width=550px}
+
+# What Happens If We Ignore Measurement Error?
+
+In the domain of causal inference, the central concern with measurement error lies not in its mere existence, but in its consequences for the estimation of the causal estimand of interest. Measurement error becomes substantively meaningful only insofar as it compromises the validity or efficiency of our estimates. If the presence of such error in the treatment or in observed confounders has negligible influence on the target estimand, it may reasonably be considered a secondary issue. 
+
+In what follows, we employ simple simulation exercises to explore the ramifications of ignoring measurement error---first in the treatment variable, and then in the confounders. In both cases, we restrict attention to classical measurement error, characterized by random noise rather than systematic bias. This focus allows us to examine the inferential distortions introduced by variance-based error in isolation, thereby offering an intuitive understanding of when and how such imperfections matter for causal estimation.
+
+## Measurement Error in Treatment (aka Attenuation Bias)
+
+Although stylized and somewhat removed from many empirical contexts, consider a simplified case in which the causal structure is fully captured by the direct relationship $D \to Y$. In such a setting, where no confounding is present, merely observing the treatment variable $D$ and the outcome $Y$ is sufficient for causal identification. Researchers interested in estimating the causal effect of $D$ on $Y$ might then fit the following OLS model:
 $$
-\begin{aligned}
-&\text{\textbf{\textcolor{red}{True Model:}}} \\
-&Y_i = \alpha + \beta D_i + \epsilon_i \quad  \text{where} \; D_i \sim \mathcal{N}(0, 1) \; \text{and} \; \epsilon_i \sim \mathcal{N}(0, 1)
-\end{aligned}
+Y_i = \alpha + \tau D_i + \varepsilon_i,
 $$
-
-But instead we have,
-
+where $\tau$ represents the causal estimand of interest. Now suppose, however, that the treatment variable $D_i$ is measured with error, and the researcher observes only a noisy proxy $D_i^*$. In this case, the model estimated in practice becomes:
 $$
-\begin{aligned}
-&\text{\textbf{Observed Model:}} \\
-&Y_i = \tilde{\alpha} + \tilde{\beta} D_i^* + \tilde{\epsilon}_i \quad \; \text{where} \; D_i^* = D_i + \eta_i \; \text{and} \; \eta_i \sim \mathcal{N}(0, 1)  
-\end{aligned}
+Y_i = \alpha^{\text{ep}} + \tau^{\text{ep}} D_i^* + \varepsilon_i^{\text{ep}},
 $$
+where $\tau^{\text{ep}}$ is the coefficient obtained from regressing $Y$ on the error-prone version of the treatment. The key question is how this naive estimator $\hat{\tau}^{\text{ep}}$ compares to the true causal effect $\tau$ when the measurement error in $D_i^*$ is ignored.
 
-Consider a simulation with $N=1000$ observations where the true effect $\beta = 2$:
+To illustrate this, we conduct a simulation where the true treatment effect is $\tau = 2$, and the continuous treatment variable $D$ is measured with error such that $D^* = D + u$, with $u \sim \mathcal{N}(0, 1)$. Although $D$ is treated as continuous for ease of interpretation, the underlying logic holds for binary treatments as well.
 
-- What if the measurement error was heteroscedastic?
-- What if the true effect was negative, $\beta = -2$?
+```{r sim_attenuation_bias}
+#| fig-width: 4
+#| fig-height: 6
+#| fig-align: center
 
-**In sum, measurement error in the treatment variable attenuates the true effect. This is often referred to as "attenuation bias."**
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(tidyverse, patchwork)
 
-## Error in observed confounder
+set.seed(2025)
 
-In the scenario where an observed confounder is measured with error, we would like to estimate:
+n <- 1000
+tau_true <- 2
+sigma_d <- 1
+sigma_u <- 1
+sigma_eps <- 1
 
+# Data generation
+D <- rnorm(n, 0, sigma_d)
+u <- rnorm(n, 0, sigma_u)
+D_star <- D + u
+eps <- rnorm(n, 0, sigma_eps)
+Y <- tau_true * D + eps
+
+# Create long-format data for ggplot
+df <- data.frame(
+  Y = Y,
+  D_true = D,
+  D_star = D_star
+)
+
+# Regression fits
+fit_true <- lm(Y ~ D_true, data = df)
+fit_star <- lm(Y ~ D_star, data = df)
+
+# Predictions for plotting regression lines
+d_seq <- seq(-5, 5, length.out = 200)
+pred_true <- predict(fit_true, newdata = data.frame(D_true = d_seq))
+pred_star <- predict(fit_star, newdata = data.frame(D_star = d_seq))
+
+df_lines <- data.frame(
+  D = d_seq,
+  Y_true = pred_true,
+  Y_star = pred_star
+)
+
+# Plot
+p <- ggplot() +
+  geom_point(aes(x = D, y = Y), alpha = 0.2, color = "black") +
+  geom_point(aes(x = D_star, y = Y), alpha = 0.2, color = "red") +
+  geom_line(data = df_lines, aes(x = D, y = Y_true), color = "black", size = 2) +
+  geom_line(data = df_lines, aes(x = D, y = Y_star), color = "red", size = 2) +
+  labs(
+    x = "D (or D*)",
+    y = "Y"
+  ) +
+  scale_x_continuous(expand = c(0, 0), limits = c(-5, 5)) +
+  scale_y_continuous(expand = c(0, 0), limits = c(-10, 10),
+                     breaks = c(-10, -7.5, -5, -2.5, 0, 2.5, 5, 7.5, 10)) +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor = element_blank())
+
+p
+```
+
+In the accompanying plot, the black dots and lines represent the case where the true value of $D$ is observed, while the red points correspond to the error-prone measure $D^*$. Due to the added noise, the red dots are more horizontally dispersed, although the vertical spread remains similar. This visualization highlights a key empirical consequence of classical measurement error in the treatment variable: it leads to a systematic underestimation of the true effect (true slope is $2$, while the estimated slope with error-prone variable is $1$). This pattern is commonly known as *attenuation bias*, a well-documented result in econometrics literatures [@wooldridge2012introductory].
+
+## Measurement Error in an Observed Confounder
+
+We now turn to the case in which measurement error arises not in the treatment variable, but in an observed confounder. In the ideal scenario---where all relevant variables are measured without error---the researcher would estimate the following OLS model:
 $$
-\begin{aligned}
-&\text{\textbf{\textcolor{red}{True Model:}}} \\
-&Y_i = \alpha + \beta D_i +\gamma X_i + \epsilon_i \quad 
-\text{where} \; D_i \sim \mathcal{N}(0, 1), \; X_i \sim \mathcal{N}(0, 1), \; \text{and} \; \epsilon_i \sim \mathcal{N}(0, 1)
-\end{aligned}
+Y_i = \alpha + \tau D_i + \gamma X_i + \varepsilon_i,
 $$
+where $D_i$ is the treatment, $X_i$ is a confounder, and $\tau$ represents the causal effect of interest.
 
-But instead we see: 
-
+However, in the presence of measurement error, we observe only an error-prone proxy $X_i^*$ rather than the true confounder $X_i$. In that case, the estimated model becomes:
 $$
-\begin{aligned}
-&\text{\textbf{Observed Model:}} \\
-&Y_i = \tilde{\alpha} + \tilde{\beta} D_i + \tilde{\gamma} X_i^* + \tilde{\epsilon}_i \quad \text{where } \; X_i^* = X_i + \eta_i \; \text{and} \; \eta_i \sim \mathcal{N}(0, 1)  
-\end{aligned}
-$$
-
-Consider a scenario where $\text{corr}(D_i, X_i) = +0.7$. In a simulation with $N=1000$ observations, $\beta = 1$, and $\gamma = 2$:
-
-- What if $\text{corr}(D_i, X_i) = -0.7$?
-
-**In sum, measurement error in observed confounders can lead to biased estimates of the treatment effect in any direction.**
-
-# Methods for addressing measurement error
-
-Generally, the methods available for addressing measurement error depend on whether or not your study design enables you to collect additional data which illuminates information about the error in your variables. This type of additional data commonly falls into 2 cases:
-
-- **Validation Data:** Where you collect "gold standard" measurements of the error-prone variable for a subset of the sample. In our effect of college on future earnings example, this could look like administering a survey that collects additional data about students' family SES beyond FAFSA measures such as: information about families' social networks, prior zip codes the student has lived in, and participation in extracurricular activities.
-- **Repeated Mesurements:** Where you collect repeated measurements from each individual subject and estimate the variance of the measurement error, $\eta_i \sim \mathcal{N}(0, \sigma^2_\eta)$. Again, in our college example this could look like collecting a students' FAFSA data across every year they were enrolled in college to estimate the variance.
-
-In the situation where you have additional validation data, your measurement error problem essentially turns into a missing data problem. Much research has been produced in this area and includes methods such as multiple imputation and regression calibration.
-
-In the scenario where you are unable to collect additional data about your error prone variables, you are forced to assume a parametric structure of the measurement error generating process based on previous studies or prior knowledge. Without additional data, non-parametric identification is generally not possible. In this situation, available methods include likelihood-based approached, SIMEX, and IV. We explore direct correction/adjustment, regression calibration, control variates, and sensitivity analysis below.  
-
-## Direct Correction/Adjustment: Using validation data
-
-Consider the following DAG where there is measurement error in our variable for treatment:
-
-![](images/dag_error_in_treatment.svg){fig-align="center" width=40%}
-
-We observe:
-$$(Y_i, D_i^*, X_i, S_i) \quad \forall i\in \{1, \ldots, N\}$$
-However for a subset $n$ of our sample we have additional validation data:
-
-$$(Y_j, D_j^*, D_j, X_j, S_j = 1) \quad \forall j\in \{1, \ldots, n\}$$
-We can then:
-
-1. Estimate $\widehat{\mathbb{E}}[D_i \mid D_i^*, X_i]$ from the validation data, and
-2. $\widehat{\mathbb{E}}[D_i \mid D_i^*, X_i]$ to estimate $\mathbb{E}[Y_i \mid D_i, X_i]$
-
-## Parametric Approach: Regression Calibration
-
-An oldie but a goodie! Suppose our true model is:
-
-$$g\big(\mathbb{E}[Y_i \mid D_i, X_i]\big) = \alpha + \beta D_i + \gamma X_i$$
-To express the outcome regression in terms of observed variables, we apply the law of iterated expectations:
-$$
-\begin{aligned}
-\mathbb{E}[Y_i \mid D_i^*, X_i] &= \mathbb{E}_{D_i \mid D_i^*, X_i} [\mathbb{E}[Y_i \mid D_i, D_i^*, X_i]]\\
-&= \mathbb{E}_{D_i \mid D_i^*, X_i} [\mathbb{E}[Y_i \mid D_i, X_i]] \quad \text{(by } Y_i \perp\!\!\!\perp D_i^* \mid D_i, X_i\text{)}\\
-&= \mathbb{E}_{D_i \mid D_i^*, X_i} \left[ \alpha + \beta D_i + \gamma X_i \right] \\
-&= \alpha + \beta \cdot \mathbb{E}[D_i \mid D_i^*, X_i] + \gamma X_i     
-\end{aligned}
-$$
-This yields the regression calibration approximation:
-$$\mathbb{E}[Y_i \mid D_i^*, X_i] \approx \alpha + \beta \cdot \mathbb{E}[D_i \mid D_i^*, X_i] + \gamma X_i$$
-We can then:
-
-1. Estimate $\mathbb{E}[D_i \mid D_i^*, X_i]$ using OLS, ML, or multiple imputation
-2. Plug in our predicted $\widehat{\mathbb{E}}[D_i \mid D_i^*, X_i]$ to approximate the regression using the latent $D_i$
-
-## Control Variates Approach
-
-When we have validation data, the control variates approach allows us to:
-
-- Avoid making parametric assumptions
-- Use an estimator that is unbiased and more efficient than only using our validation data (such as in the methods previously discussed)
-
-Let's first define the following four values:
-
-$$
-\begin{align*}
-    \tau &:= \mathbb{E}[Y_{1i} - Y_{0i}] \quad \text{where} \; d \in \{0, 1\} \\[1.5em]
-    \tau_{\text{val}} &:= \mathbb{E}[Y_{1i} - Y_{0i} \mid S_i = 1] \\
-    &= \mathbb{E}_{X \mid S=1}\left[\mathbb{E}[Y_{i} \mid D_i=1, X_i, S_i = 1] - \mathbb{E}[Y_{i} \mid D_i=0, X_i, S_i = 1]\right] \\[1.5em]
-    \tau_{\text{val}}^{\text{ep}} &:= \mathbb{E}_X[\mathbb{E}[Y_i| X_i, D_i^* = 1, S_i = 1]- \mathbb{E}[Y_i| X_i, D_i^*=0, S_i = 1]] \\[1.5em]
-    \tau_{\text{full}}^{\text{ep}} &:= \mathbb{E}_X[\mathbb{E}[Y_i\mid X_i, D_i^* = 1] - \mathbb{E}[Y_i\mid X_i, D_i^*=0]]
-\end{align*}
-$$
-<span style="margin-left:3em;">Additionally,</span>
-
-$$
-\sqrt{n}\begin{pmatrix} \hat{\tau}_{\text{val}} - \tau \\ \widehat{\tau}_{\text{val}}^{\text{ep}} - \widehat{\tau}_{\text{full}}^{\text{ep}}\end{pmatrix} \xrightarrow{d} \mathcal{N}(0, \Sigma)\quad \text{where} \quad \Sigma = \begin{bmatrix} v & \Gamma^\top \\ \Gamma & V\end{bmatrix}
-$$
-<span style="margin-left:4em;">And,</span>
-
-$$
-  \widehat{\Gamma} = \widehat{\text{Cov}}(\hat{\tau}_{\text{val}}, \hat{\tau}_{\text{val}}^{\text{ep}} - \hat{\tau}_{\text{full}}^{\text{ep}}) \quad \text{and} \quad \widehat{V} = \widehat{\text{Var}}(\hat{\tau}_{\text{val}}^{\text{ep}} - \hat{\tau}_{\text{full}}^{\text{ep}})
+Y_i = \alpha^{\text{ep}} + \tau^{\text{ep}} D_i + \gamma^{\text{ep}} X_i^* + \varepsilon_i^{\text{ep}}.
 $$
 
-To compute our estimator:
+As in the previous simulation, we model the measurement error in $X^*$ using additive Gaussian noise: $X^* = X + u$, where $u \sim \mathcal{N}(0, 1)$. However, unlike the case of measurement error in the treatment---where the bias tends to attenuate the effect toward zero---measurement error in a confounder introduces more complex bias patterns. Specifically, the direction of the bias depends on the correlation between the treatment variable $D$ and the true confounder $X$.
 
-- $\hat{\tau}_{\text{CV}} = \hat{\tau}_{\text{val}} - b \left( \hat{\tau}_{\text{val}}^{\text{ep}} - \hat{\tau}_{\text{full}}^{\text{ep}} \right)$
-- $b= \widehat{\Gamma}^\top \widehat{V}^{-1} = \text{Cov}(\hat{\tau}_{\text{val}}, \hat{\tau}_{\text{val}}^{\text{ep}} - \hat{\tau}_{\text{full}}^{\text{ep}}) / \text{Var}(\hat{\tau}_{\text{val}}^{\text{ep}} - \hat{\tau}_{\text{full}}^{\text{ep}})$ ensures $\text{Var}(\hat{\tau}_{\text{CV}}) \leq \text{Var}(\hat{\tau}_{\text{val}})$ (because $\text{Var}(\hat{\tau}_{\text{CV}}) = v - \Gamma^\top V^{-1} \Gamma$)
-- $\hat{\tau}_{\text{val}}^{\text{ep}} - \hat{\tau}_{\text{full}}^{\text{ep}}$ (i.e., the control variate) is mean-zero and correlated with $\hat{\tau}_{\text{val}}$
-- Estimator for each $\hat{\tau}_{\text{val}}$, $\hat{\tau}_{\text{val}}^{\text{ep}}$, and $\hat{\tau}_{\text{full}}^{\text{ep}}$ can be flexible but Yang and Ding (2019) and Barnatchez et al. (2024) used AIPW
-- 95% CIs: $\hat{\tau}_{\text{CV}} \pm 1.96 \cdot \sqrt{\hat{v} - \hat{\Gamma}^\top \hat{V}^{-1} \hat{\Gamma}}$
+To illustrate this, we set the true causal effect $\tau$ to 1 and examine two contrasting cases: one in which the treatment and the true confounder are positively correlated ($\text{Corr}(D, X) = 0.7$), and another in which they are negatively correlated ($\text{Corr}(D, X) = -0.7$).
 
-Let's see this graphically in a simulation where,
+```{r sim_confounder}
+#| fig-width: 6
+#| fig-height: 6
+#| fig-align: center
 
-- We set true ATE to 2 via $Y_1 = Y_0 + 2$, where $Y_0 = \exp(X_1)/4 + \sin(2X_2) + \varepsilon$
-- Treatment $A$ assigned via $\text{logit}^{-1}(X_1 + 0.5 X_2)$; $A^*$ flips $A$ with 15\% probability
-- Sample size $N = 1000$; Repeat 1000 times
+set.seed(2025)
+n <- 1000
+tau <- 1
+gamma <- 2
 
+simulate_case <- function(cor_DX, label) {
+  D <- rnorm(n)
+  X <- cor_DX * D + sqrt(1 - cor_DX^2) * rnorm(n)
+  X_star <- X + rnorm(n, sd = 1)
+  Y <- tau * D + gamma * X + rnorm(n)
+  
+  # Residualize D w.r.t. X and X*
+  D_resid <- residuals(lm(D ~ X))
+  D_resid_star <- residuals(lm(D ~ X_star))
+  
+  data.frame(D, X, X_star, Y, label, D_resid, D_resid_star)
+}
+
+# Simulate and combine
+df_all <- bind_rows(
+  simulate_case(0.7, "Corr(D,X) = +0.7"),
+  simulate_case(-0.7, "Corr(D,X) = -0.7")
+)
+
+# Prediction line generator (uses D residualized on true X for plotting)
+get_lines_df <- function(df, label) {
+  fit_true <- lm(Y ~ D + X, data = df)
+  fit_star <- lm(Y ~ D + X_star, data = df)
+  
+  d_seq <- seq(min(df$D), max(df$D), length.out = 200)
+  x_fixed <- mean(df$X)
+  x_star_fixed <- mean(df$X_star)
+  
+  pred_true <- predict(fit_true, newdata = data.frame(D = d_seq, X = x_fixed))
+  pred_star <- predict(fit_star, newdata = data.frame(D = d_seq, X_star = x_star_fixed))
+  
+  d_resid_seq <- d_seq - mean(df$D)
+  
+  data.frame(
+    D_resid = rep(d_resid_seq, 2),
+    Y = c(pred_true, pred_star),
+    Model = rep(c("True X", "Measured X*"), each = length(d_seq)),
+    label = label
+  )
+}
+
+# Combine prediction lines
+df_lines <- bind_rows(
+  get_lines_df(df_all |> filter(label == "Corr(D,X) = +0.7"), "Corr(D,X) = +0.7"),
+  get_lines_df(df_all |> filter(label == "Corr(D,X) = -0.7"), "Corr(D,X) = -0.7")
+)
+
+# Plot: black = D residualized on X; red = D residualized on X*
+p <- ggplot() +
+  geom_point(data = df_all, aes(x = D_resid, y = Y), alpha = 0.1, color = "black") +
+  geom_point(data = df_all, aes(x = D_resid_star, y = Y), alpha = 0.1, color = "red") +
+  geom_line(data = df_lines, aes(x = D_resid, y = Y, color = Model, linetype = Model), size = 2) +
+  facet_wrap(~ label) +
+  scale_color_manual(values = c("True X" = "black", "Measured X*" = "red")) +
+  scale_linetype_manual(values = c("True X" = "solid", "Measured X*" = "solid")) +
+  labs(
+    x = "Residualized D", y = "Y", color = NULL, linetype = NULL
+  ) +
+  scale_x_continuous(expand = c(0, 0), limits = c(-3, 3)) +
+  scale_y_continuous(expand = c(0, 0), limits = c(-10, 10)) +
+  coord_cartesian(xlim = c(-2.5, 2.5 )) +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor = element_blank(),
+        legend.position = "none")
+
+p
+```
+
+The results reveal striking asymmetries. When $D$ and $X$ are negatively correlated, the estimated treatment effect is biased downward, underestimating the true effect. In contrast, when the correlation is positive, the bias shifts upward, leading to an overestimation of the effect. Notably, the measurement error process is held constant across both cases---simple additive Gaussian noise---yet its consequences for the treatment effect estimation are diametrically opposed. 
 
 # Correcting Bias with Validation in a Subsample
 
-While the problem of measurement error in the modern causal inference framework has received relatively recent attention, its correction has a long-standing tradition in fields such as statistics, econometrics, and psychometrics, particularly within the linear modeling framework. Broadly speaking, there are two main strategies for addressing this issue. The first involves collecting higher-quality measurements—often referred to as *validation data*—for a subset of the sample and using this information to correct bias in the full-sample analysis. The second strategy relies on prior knowledge or assumptions about the data-generating process. This typically entails imposing a parametric structure on the measurement error mechanism and using this structure to adjust the bias analytically or through simulation-based methods such as SIMEX [@cook1994simulation].
+Although the problem of measurement error has only recently attracted renewed interest in modern causal inference frameworks, its correction has a long-standing history in related fields such as statistics, econometrics, and psychometrics---particularly within the linear modeling tradition. Broadly speaking, two classes of strategies have been developed to address this issue. The first relies on the collection of higher-quality measurements---often referred to as validation data---for a subset of the sample, which can then be used to correct bias in the larger dataset. The second strategy invokes prior knowledge or strong assumptions about the data-generating process, typically by imposing a parametric structure on the measurement error mechanism. This approach enables analytical correction or simulation-based adjustments, such as the Simulation-Extrapolation (SIMEX) method [@cook1994simulation].
 
-In this tutorial, we focus on two approaches that follow the first strategy, where a subset of the data contains accurate measurements of either the treatment variable $D$ or the confounder $X$, while the entire dataset includes only their error-prone proxies $D^*$ or $X^*$. We begin with regression calibration [@carroll2006measurement], a classical method rooted in linear regression that leverages validation data to correct for bias. We then introduce the control variates approach [@yang2020combining; @barnatchez2024flexible], which offers greater flexibility. Unlike regression calibration, this method does not require strong parametric assumptions about the measurement error process and can be integrated with modern estimators such as inverse probability weighting (IPW) or augmented inverse probability weighting (AIPW).
+In this tutorial, we focus on approaches aligned with the first strategy: those that exploit a subset of the data containing accurate measurements of either the treatment variable $D$ or the confounder $X$, while the full dataset contains only their error-prone proxies $D^*$ or $X^*$. To build intuition, consider a situation in which the researcher has access to precise measurements for only a small fraction of the sample. This gives rise to two extreme options: (i) conduct the analysis solely on the validated subsample, or (ii) ignore measurement error altogether and proceed with the full sample using the noisy proxies. The former yields an unbiased estimate but suffers from high variance due to limited sample size; the latter benefits from lower variance but introduces systematic bias. The central challenge, then, is to identify a principled method for using validation data that balances the trade-off between bias and variance---leveraging the advantages of both information sources.
 
-## Parametric approach: Regression calibration
+We introduce two such methods in this tutorial. The first is regression calibration [@carroll2006measurement], a classical correction technique rooted in linear regression that uses validation data to mitigate bias. The second is the control variates approach [@yang2020combining; @barnatchez2024flexible], which provides a more flexible framework for bias reduction and precision improvement, particularly in settings that extend beyond the classical linear model.
 
-## Control variates approach
+<!-- Unlike regression calibration, this method does not require strong parametric assumptions about the measurement error process and can be integrated with modern estimators such as inverse probability weighting (IPW) or augmented inverse probability weighting (AIPW). -->
 
-Consider a setting in which the treatment indicator $D_i$ is measured with error, such that we observe only a noisy proxy $D_i^*$. However, for a subset of the sample—indexed by $S_i = 1$—we observe the true treatment value $D_i$. Given that $D_i^*$ is a noisy variable prone to attenuation bias, what is the most straightforward strategy for estimating the average treatment effect (ATE) in this setting?
+## Parametric Approach: Regression Calibration
+
+Regression calibration represents one of the earliest algorithmic strategies for addressing measurement error, and it remains widely utilized due to its intuitive appeal and straightforward implementation. While originally not developed within the causal inference paradigm, once causal identification is established, regression calibration may be employed for the purpose of estimating point estimates and confidence intervals, as it serves fundamentally as a method of statistical adjustment.
+
+Consider the case in which the treatment variable is measured with error:
+
+![](images/dag_error_in_treatment.svg){fig-align="center" width=300px}
+
+Let us assume that for all units $i \in \{1, 2, \ldots, N\}$, we observe the tuple $(Y_i, D_i^*, X_i, S_i)$, where $Y_i$ denotes the observed outcome, $D_i^*$ the error-prone measure of the treatment, $X_i$ a pre-treatment confounder, and $S_i$ an indicator variable signifying whether unit $i$ belongs to the validation subsample. For a subset of the sample, indexed by $j \in \{1, 2, \ldots, n\}$, we observe not only $(Y_j, D_j^*, X_j)$ but also the true treatment assignment $D_j$, with $S_j = 1$ indicating inclusion in the validation data.
+
+We suppose the true data-generating process follows the linear model:
+$$
+Y_i = \alpha + \tau D_i + \gamma X_i + \varepsilon_i.
+$$
+
+Regression calibration proceeds by first estimating the relationship between the true and error-prone variables using the validation data. Specifically, we posit a calibration model of the form:
+$$
+D_j = h(D_j^*, X_j; \gamma) + \eta_j,
+$$
+where $h(D_j^*, X_j; \gamma)$ is a parametric prediction function---typically a linear regression---used to approximate $\mathbb{E}[D_j \mid D_j^*, X_j]$, and $\eta_j$ denotes a mean-zero stochastic error term.
+
+Importantly, the function $h(\cdot)$ is not assumed to recover the structural or causal relation between the mismeasured and true treatment but serves as a statistical approximation that captures the conditional expectation of the true variable given observed quantities. This model does not require strong structural assumptions---only that the validation data allow consistent estimation of the conditional mean.
+
+After estimating $\widehat{\gamma}$ from the calibration model, we impute predicted values of the true treatment for the entire sample as:
+$$
+\widehat{D}_i = h(D_i^*, X_i; \widehat{\gamma}).
+$$
+
+These imputed values are then substituted in place of the unobserved $D_i$ in the main regression model:
+$$
+Y_i = \alpha + \tau \widehat{D}_i + \gamma X_i + \varepsilon_i.
+$$
+
+Conceptually, this approach resembles imputation methods commonly used in missing data analysis, where the validation sample provides the necessary information for recovering latent or mismeasured variables [@carroll2006measurement].
+
+It is worth noting that this regression calibration estimator is approximately consistent for $\tau$ under classical measurement error assumptions, especially when the measurement error is nondifferential and the calibration model is correctly specified. However, it may not be fully efficient, and standard errors must be corrected (e.g., via sandwich estimators or bootstrap) to account for the uncertainty in the imputed values.
+
+The following simulation illustrates a case in which the treatment variable $D \in \{0,1\}$ is subject to classical misclassification, where the observed proxy $D^*$ is generated by randomly flipping the true value with 30\% probability. The true treatment $D$ is not assigned at random but instead depends on a confounder $X \sim \mathcal{N}(0,1)$, such that $\mathbb{P}(D = 1 \mid X)$ follows a logistic function, thereby establishing $X$ as a confounder influencing both treatment assignment and the outcome. The outcome follows the linear model $Y = \alpha + \tau D + \gamma X + \varepsilon$, with $\tau = 2$ as the true causal effect of treatment. Because the observed treatment $D^*$ is a noisy version of $D$, regressing $Y$ on $D^*$ and $X$ yields a biased (attenuated) estimate of $\tau$. To address this, regression calibration uses a validation subset in which $D$ is observed to estimate a calibration model (via logistic regression) for $\mathbb{P}(D = 1 \mid D^*, X)$, then imputes the conditional expectation $\widehat{D} = \mathbb{E}[D \mid D^*, X]$ for all units. Plugging $\widehat{D}$ into the main regression recovers an approximately unbiased estimate of $\tau$. The simulation results show that this approach substantially corrects the attenuation bias. However, since the imputed $\widehat{D}$ is itself an estimate---based on a finite validation set---this correction introduces additional variance, leading to a slight loss of efficiency compared to the naive estimator. This highlights the classic bias-variance tradeoff inherent in regression calibration: it reduces bias at the cost of increased variability.
+
+```{r sim_reg_calibration}
+#| fig-width: 6
+#| fig-height: 4
+#| fig-align: center
+
+set.seed(2025)
+
+# Parameters
+N <- 1000
+n_val <- 200
+B <- 1000
+tau <- 2
+gamma <- 1
+alpha <- 0
+delta_0 <- 0
+delta_1 <- 1.5  # Strength of confounding (X -> D)
+
+# Simulate data
+X <- rnorm(N)
+prob_D <- plogis(delta_0 + delta_1 * X)  # logistic(X) for treatment probability
+D <- rbinom(N, 1, prob_D)                # True treatment influenced by X
+Y <- alpha + tau * D + gamma * X + rnorm(N)
+
+# Introduce 30% random flipping (misclassification)
+D_star <- ifelse(runif(N) < 0.3, 1 - D, D)
+
+# Validation indicator
+S <- rep(0, N)
+val_idx <- sample(1:N, n_val)
+S[val_idx] <- 1
+
+# Bootstrap storage
+est_naive <- numeric(B)
+est_rc <- numeric(B)
+
+for (b in 1:B) {
+  idx <- sample(1:N, N, replace = TRUE)
+  
+  X_b <- X[idx]
+  D_b <- D[idx]
+  D_star_b <- D_star[idx]
+  Y_b <- Y[idx]
+  S_b <- S[idx]
+  
+  # Naive regression
+  fit_naive <- lm(Y_b ~ D_star_b + X_b)
+  est_naive[b] <- coef(fit_naive)["D_star_b"]
+  
+  # Logistic regression calibration in validation sample
+  calib_fit <- glm(D_b ~ D_star_b + X_b, subset = S_b == 1, family = binomial)
+  D_hat_b <- predict(calib_fit, newdata = data.frame(D_star_b = D_star_b, X_b = X_b), type = "response")
+  
+  # RC regression with imputed treatment probability
+  fit_rc <- lm(Y_b ~ D_hat_b + X_b)
+  est_rc[b] <- coef(fit_rc)["D_hat_b"]
+}
+
+# Combine and plot
+df_plot <- data.frame(
+  estimate = c(est_naive, est_rc),
+  method = rep(c("Naive (D*)", "Regression Calibration"), each = B)
+)
+
+# Plot
+p <- ggplot(df_plot, aes(x = estimate, fill = method)) +
+  geom_histogram(colour = "white", bins = 40, alpha = 0.7, position = "identity") +
+  geom_vline(xintercept = tau, linetype = 3, size = 1.5, color = "black") +
+  facet_wrap(~ method, scales = "free") +
+  labs(x = "Estimated Treatment Effect", y = "Count") +
+  scale_x_continuous(limits = c(0, 3.5)) +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor = element_blank(),
+        legend.position = "none")
+
+p
+```
+
+
+## Control Variates Approach
+
+While regression calibration offers a simple and intuitive correction for measurement error by modeling the relationship between the mismeasured and true treatment values, its performance hinges critically on correctly specifying the calibration model and treating the imputed values as fixed in subsequent outcome estimation. This can be problematic in settings where the relationship between $D_i^*$ and $D_i$ is complex or nonlinear, or when the outcome model is itself nonlinear, such as in logistic regression. Moreover, regression calibration typically involves substituting $\widehat{D}_i$ for $D_i$ in a plug-in fashion, which may result in biased or inefficient estimates when the calibration error is substantial or when variance from the imputation step is not properly accounted for. The control variates approach, by contrast, offers a more general and robust strategy: it corrects bias and improves efficiency by combining an unbiased estimator based on the validation sample with auxiliary estimators derived from the larger, error-prone sample, without requiring strong modeling assumptions about the measurement process. Crucially, it does so in a way that directly targets the efficiency loss from validation subsampling, while maintaining the consistency of the final estimator.
+
+Consider a setting in which the treatment indicator $D_i$ is measured with error, such that we observe only a noisy proxy $D_i^*$. However, for a subset of the sample---indexed by $S_i = 1$---we observe the true treatment value $D_i$. Given that $D_i^*$ is a noisy variable prone to attenuation bias, what is the most straightforward strategy for estimating the ATE in this setting?
 
 A simple approach is to restrict estimation to the validation subset for which the true treatment values $D_i$ are observed. This yields an estimate of the conditional average treatment effect among the validated units:
 $$
 \tau_{\text{val}} = \mathbb{E}[Y_{1i} - Y_{0i} \mid S_i = 1].
 $$
-If the validation sample is selected completely at random—formally, if $Y_{1i}, Y_{0i}, D_i, D_i^*, X_i \indep S_i$—then this conditional estimand is equal to the population ATE:
+If the validation sample is selected completely at random---formally, if $Y_{1i}, Y_{0i}, D_i, D_i^*, X_i \indep S_i$---then this conditional estimand is equal to the population ATE:
 $$
 \tau_{\text{val}} = \mathbb{E}[Y_{1i} - Y_{0i} \mid S_i = 1] = \mathbb{E}[Y_{1i} - Y_{0i}] = \tau.
 $$
 In this case, $\hat{\tau}_{\text{val}}$ is an unbiased estimator for $\tau$, i.e., $\mathbb{E}[\hat{\tau}_{\text{val}}] = \tau$. However, relying solely on the validation subset may be inefficient, especially when the subset is small. Although unbiased, $\hat{\tau}_{\text{val}}$ may suffer from high variance, resulting in wide confidence intervals and limited inferential value.
 
-The control variates approach addresses this issue by starting with $\hat{\tau}_{\text{val}}$ and then leveraging auxiliary information from the full sample—where only the error-prone $D_i^*$ is available—to improve estimation precision. The core idea is to extract the informative component of $D_i^*$ in a way that reduces variance without introducing bias, thereby improving the asymptotic efficiency of the estimator.
-=======
-Which is:
+The control variates approach addresses this issue by starting with $\hat{\tau}_{\text{val}}$ and then leveraging auxiliary information from the full sample---where only the error-prone $D_i^*$ is available---to improve estimation precision. The core idea is to extract the informative component of $D_i^*$ in a way that reduces variance without introducing bias, thereby improving the asymptotic efficiency of the estimator.
 
+To formalize this, let $\hat{\tau}_{\text{val}}$ denote a consistent estimator of the ATE obtained from the validation dataset, where the true treatment $D_i$ is observed. Suppose also that we compute an error-prone estimator $\hat{\tau}_{\text{main}}$ from the full dataset using the mismeasured treatment $D_i^*$. Although $\hat{\tau}_{\text{main}}$ is generally biased, it may still be highly correlated with $\hat{\tau}_{\text{val}}$. The key idea, following @yang2020combining, is to construct an improved estimator of the form:
 $$
-\begin{aligned}
-&= \sqrt{\dfrac{R^2_{Y \sim X \mid D}}{1 - R^2_{X \sim D}}} \cdot 
-\frac{\text{sd}(Y^{\perp D})}{\text{sd}(D^{\perp X^*})} \cdot 
-\left[ (1 - \rho) + \rho \cdot \sqrt{\frac{1 - \rho}{\rho}} \right] \\
-&= \sqrt{
-  \frac{\rho \cdot R^2_{Y \sim X^* \mid D} \cdot (1 - R^2_{X^* \sim D})}
-  { \left(\rho - R^2_{X^* \sim D}\right)^2}
-  } \cdot \frac{\text{sd}(Y^{\perp D})}{\text{sd}(D^{\perp X^*})} \cdot 
-  \left[(1 - \rho) + \rho \cdot \sqrt{\frac{1 - \rho}{\rho}} \right]
-\end{aligned}
+\hat{\tau}_{\text{cv}} = \hat{\tau}_{\text{val}} - \Gamma^\top V^{-1} (\hat{\tau}_{\text{val,ep}} - \hat{\tau}_{\text{main}}),
 $$
+where $\hat{\tau}_{\text{val,ep}}$ is the error-prone estimator computed from the validation sample using only $D_i^*$, and $\Gamma$ and $V$ are the sample covariance and variance of $(\hat{\tau}_{\text{val}}, \hat{\tau}_{\text{val,ep}} - \hat{\tau}_{\text{main}})$, respectively. Under mild regularity conditions, this estimator is consistent for the true ATE $\tau$, and asymptotically more efficient than $\hat{\tau}_{\text{val}}$ alone. Crucially, this result does not rely on $\hat{\tau}_{\text{main}}$ or $\hat{\tau}_{\text{val,ep}}$ being consistent for $\tau$; it only requires that they converge to the same finite limit, which is typically satisfied when both estimators are derived from the same estimation procedure applied to $D_i^*$ and $X_i$. In this way, the proposed control variates estimator leverages the stability and efficiency of $\hat{\tau}_{\text{main}}$ to reduce the variance of the unbiased but potentially noisy $\hat{\tau}_{\text{val}}$. This approach generalizes beyond linear regression and can be applied to a wide class of asymptotically linear estimators, including inverse probability weighting and augmented estimators, as long as the difference $(\hat{\tau}_{\text{val,ep}} - \hat{\tau}_{\text{main}})$ is estimable and asymptotically negligible.
 
-@yang2020combining
+We simulate a setting where the binary treatment variable is measured with error, and a small fraction of the data includes validation information containing the true treatment status. Covariates $X_1, X_2 \sim \mathcal{N}(0,1)$ determine the true treatment $D$ via a logistic model, and the observed treatment $D^*$ is generated by flipping $D$ with probability $15\%$. Potential outcomes are nonlinear functions of the covariates, and the true ATE is set to $2$. We compare three estimators: (i) a \emph{validation-only} estimator that fits a linear regression using only the validated subset; (ii) an \emph{error-prone main} estimator that uses the full sample but relies on the misclassified treatment $D^*$; and (iii) a \emph{control variates} estimator that corrects the validation-only estimate by leveraging the discrepancy between the error-prone estimates in the full and validation samples. The simulation shows that the error-prone estimator exhibits clear attenuation bias despite its low variance. In contrast, both the validation-only and control variates estimators are approximately unbiased. Importantly, the control variates estimator consistently achieves lower variance than the validation-only estimator across all validation fractions, thereby demonstrating that incorporating auxiliary information from the error-prone full sample---while correcting for its bias---can yield a more efficient yet still unbiased estimate. 
+
+```{r simulation_control_variates}
+#| fig-width: 8
+#| fig-height: 4
+#| fig-align: center
+
+set.seed(2025)
+
+simulate_once <- function(n, val_frac, misclass_rate = 0.15) {
+  X1 <- rnorm(n)
+  X2 <- rnorm(n)
+  p <- plogis(X1 + 0.5 * X2)
+  D <- rbinom(n, 1, p)
+  D_star <- ifelse(runif(n) < misclass_rate, 1 - D, D)
+  
+  # Define potential outcomes
+  Y0 <- exp(X1) / 4 + sin(2 * X2) + rnorm(n)
+  Y1 <- 2 + exp(X1) / 4 + sin(2 * X2) + rnorm(n)  # add ATE = 2
+  
+  # Reveal observed outcome
+  Y <- ifelse(D == 1, Y1, Y0)
+  
+  # Validation indicator
+  S <- rep(0, n)
+  S[sample(1:n, size = n * val_frac)] <- 1
+  
+  df <- data.frame(Y, D, D_star, X1, X2, S)
+  
+  tau_val <- coef(lm(Y ~ D + X1 + X2, data = df |> filter(S == 1)))["D"]
+  tau_ep_main <- coef(lm(Y ~ D_star + X1 + X2, data = df))["D_star"]
+  tau_ep_val <- coef(lm(Y ~ D_star + X1 + X2, data = df |> filter(S == 1)))["D_star"]
+  
+  setNames(c(tau_val, tau_ep_main, tau_ep_val),
+           c("tau_val", "tau_ep_main", "tau_ep_val"))
+}
+
+# Settings
+n <- 1000
+val_fracs <- seq(0.1, 0.5, by = 0.1)
+n_sim <- 1000
+true_tau <- 2
+
+# Run and collect full simulation results
+all_sims <- lapply(val_fracs, function(vf) {
+  sims <- replicate(n_sim, simulate_once(n, vf), simplify = "matrix")
+  
+  tau_val_vec <- sims["tau_val", ]
+  tau_ep_main_vec <- sims["tau_ep_main", ]
+  tau_ep_val_vec <- sims["tau_ep_val", ]
+  control_variate <- tau_ep_val_vec - tau_ep_main_vec
+  b_hat <- cov(tau_val_vec, control_variate) / var(control_variate)
+  tau_cv_vec <- tau_val_vec - b_hat * control_variate
+  
+  data.frame(
+    val_frac = vf,
+    validation_only = tau_val_vec,
+    error_prone_main = tau_ep_main_vec,
+    control_variates = tau_cv_vec
+  )
+})
+
+# Reshape to long format
+all_sims_df <- bind_rows(all_sims) |>
+  pivot_longer(cols = c("validation_only", "error_prone_main", "control_variates"),
+               names_to = "estimator", values_to = "estimate") |>
+  mutate(bias = estimate - true_tau)
+
+bias_summary <- all_sims_df |>
+  group_by(val_frac, estimator) |>
+  summarise(bias = mean(bias), variance = var(estimate), .groups = "drop") |> 
+  mutate(RMSE = sqrt(bias^2 + variance)) |> 
+  mutate(estimator = factor(estimator, levels = c("control_variates", "validation_only", "error_prone_main"))) |>
+  mutate(estimator = recode(estimator, 
+                            validation_only = "Validation Only",
+                            error_prone_main = "Error-Prone Main",
+                            control_variates = "Control Variates"))
+
+
+# Create plots
+p1 <- bias_summary |> 
+  ggplot(aes(x = val_frac, y = bias, color = estimator, shape = estimator)) +
+  geom_line(size = .5) +
+  geom_point(size = 3) +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor = element_blank()) +
+  labs(x = "Validation sample fraction", y = "Bias", color = NULL, shape = NULL)
+
+p2 <- ggplot(bias_summary, aes(x = val_frac, y = variance, color = estimator, shape = estimator)) +
+  geom_line(size = .5) +
+  geom_point(size = 3) +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor = element_blank()) +
+  labs(x = "Validation sample fraction", y = "Variance", color = NULL, shape = NULL)
+
+# Combine with shared legend
+p <- (p1 | p2) + 
+  plot_layout(guides = "collect") & 
+  theme(legend.position = "top")
+
+p
+```
+
+

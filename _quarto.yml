@@ -4,6 +4,7 @@ project:
 
 format:
   html:
+    anchor-sections: true
     math: mathjax
     include-in-header:
       text: |
@@ -11,13 +12,18 @@ format:
         MathJax = {
           tex: {
             macros: {
-              indep: "\\perp\\!\\!\\!\\perp"
+              indep: "\\perp\\!\\!\\!\\perp",
+              notindep: "\\not\\!\\!\\perp\\!\\!\\!\\perp"
             }
           }
         };
         </script>
     toc: true
+    # toc-title: Contents
+    # toc-expand: 2
+    # toc-location: left
     code-fold: true
+    code-line-numbers: true
     css: styles/custom.scss
 
 bibliography: refs/references.bib
