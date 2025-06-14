@@ -17,7 +17,7 @@ This tutorial pursues two objectives. First, through a series of simple simulati
 
 ## Notations
 
-Throughout this tutorial, we adhere to a consistent notational convention. Let $D_i$ denote the treatment assignment for unit $i$, where $d \in {0, 1}$ in the binary case. While our discussion centers on binary treatments, the analytical framework extends in a straightforward manner to settings involving multi-valued or continuous treatments. The potential outcome corresponding to treatment level $d$ for unit $i$ is denoted by $Y_{di}$. Under a binary treatment regime, the observed outcome follows the canonical switching equation:
+Throughout this tutorial, we adhere to a consistent notational convention. Let $D_i$ denote the treatment assignment for unit $i$, where $d \in \{0, 1\}$ in the binary case. While our discussion centers on binary treatments, the analytical framework extends in a straightforward manner to settings involving multi-valued or continuous treatments. The potential outcome corresponding to treatment level $d$ for unit $i$ is denoted by $Y_{di}$. Under a binary treatment regime, the observed outcome follows the canonical switching equation:
 $Y_i = D_i Y_{1i} + (1 - D_i) Y_{0i}$.
 
 We represent observed covariates by $X_i$ in the univariate case, and by $\textbf{X}_i$ when referring to a vector of pre-treatment characteristics for unit $i$. To distinguish true values from their imperfect or proxy counterparts, we adopt the conventional notation of appending an asterisk. Accordingly, $X_i^*$ denotes a noisy or error-prone measurement of $X_i$, and $D_i^*$ refers to a mismeasured or surrogate version of the treatment variable $D_i$.
@@ -178,7 +178,7 @@ p <- ggplot() +
   theme_bw(base_size = 18) +
   theme(panel.grid.minor = element_blank())
 
-p
+print(p)
 ```
 
 In the accompanying plot, the black dots and lines represent the case where the true value of $D$ is observed, while the red points correspond to the error-prone measure $D^*$. Due to the added noise, the red dots are more horizontally dispersed, although the vertical spread remains similar. This visualization highlights a key empirical consequence of classical measurement error in the treatment variable: it leads to a systematic underestimation of the true effect (true slope is $2$, while the estimated slope with error-prone variable is $1$). This pattern is commonly known as *attenuation bias*, a well-documented result in econometrics literatures [@wooldridge2012introductory].
@@ -275,7 +275,7 @@ p <- ggplot() +
   theme(panel.grid.minor = element_blank(),
         legend.position = "none")
 
-p
+print(p)
 ```
 
 The results reveal striking asymmetries. When $D$ and $X$ are negatively correlated, the estimated treatment effect is biased downward, underestimating the true effect. In contrast, when the correlation is positive, the bias shifts upward, leading to an overestimation of the effect. Notably, the measurement error process is held constant across both cases---simple additive Gaussian noise---yet its consequences for the treatment effect estimation are diametrically opposed. 
@@ -287,8 +287,6 @@ Although the problem of measurement error has only recently attracted renewed in
 In this tutorial, we focus on approaches aligned with the first strategy: those that exploit a subset of the data containing accurate measurements of either the treatment variable $D$ or the confounder $X$, while the full dataset contains only their error-prone proxies $D^*$ or $X^*$. To build intuition, consider a situation in which the researcher has access to precise measurements for only a small fraction of the sample. This gives rise to two extreme options: (i) conduct the analysis solely on the validated subsample, or (ii) ignore measurement error altogether and proceed with the full sample using the noisy proxies. The former yields an unbiased estimate but suffers from high variance due to limited sample size; the latter benefits from lower variance but introduces systematic bias. The central challenge, then, is to identify a principled method for using validation data that balances the trade-off between bias and variance---leveraging the advantages of both information sources.
 
 We introduce two such methods in this tutorial. The first is regression calibration [@carroll2006measurement], a classical correction technique rooted in linear regression that uses validation data to mitigate bias. The second is the control variates approach [@yang2020combining; @barnatchez2024flexible], which provides a more flexible framework for bias reduction and precision improvement, particularly in settings that extend beyond the classical linear model.
-
-<!-- Unlike regression calibration, this method does not require strong parametric assumptions about the measurement error process and can be integrated with modern estimators such as inverse probability weighting (IPW) or augmented inverse probability weighting (AIPW). -->
 
 ## Parametric Approach: Regression Calibration
 
@@ -403,7 +401,7 @@ p <- ggplot(df_plot, aes(x = estimate, fill = method)) +
   theme(panel.grid.minor = element_blank(),
         legend.position = "none")
 
-p
+print(p)
 ```
 
 
@@ -531,7 +529,5 @@ p <- (p1 | p2) +
   plot_layout(guides = "collect") & 
   theme(legend.position = "top")
 
-p
+print(p)
 ```
-
-
