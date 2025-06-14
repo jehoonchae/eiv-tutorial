@@ -377,35 +377,29 @@ Y_i = \alpha^{\text{ep}} + \tau^{\text{ep}} D_i^* + \varepsilon_i^{\text{ep}},
 <span id="cb1-36"><a href="#cb1-36"></a>  <span class="at">D =</span> d_seq,</span>
 <span id="cb1-37"><a href="#cb1-37"></a>  <span class="at">Y_true =</span> pred_true,</span>
 <span id="cb1-38"><a href="#cb1-38"></a>  <span class="at">Y_star =</span> pred_star</span>
-<span id="cb1-39"><a href="#cb1-39"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-39"><a href="#cb1-39"></a>)</span>
+<span id="cb1-40"><a href="#cb1-40"></a></span>
+<span id="cb1-41"><a href="#cb1-41"></a><span class="co"># Plot</span></span>
+<span id="cb1-42"><a href="#cb1-42"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb1-43"><a href="#cb1-43"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> D, <span class="at">y =</span> Y), <span class="at">alpha =</span> <span class="fl">0.2</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb1-44"><a href="#cb1-44"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> D_star, <span class="at">y =</span> Y), <span class="at">alpha =</span> <span class="fl">0.2</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb1-45"><a href="#cb1-45"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> df_lines, <span class="fu">aes</span>(<span class="at">x =</span> D, <span class="at">y =</span> Y_true), <span class="at">color =</span> <span class="st">"black"</span>, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb1-46"><a href="#cb1-46"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> df_lines, <span class="fu">aes</span>(<span class="at">x =</span> D, <span class="at">y =</span> Y_star), <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb1-47"><a href="#cb1-47"></a>  <span class="fu">labs</span>(</span>
+<span id="cb1-48"><a href="#cb1-48"></a>    <span class="at">x =</span> <span class="st">"D (or D*)"</span>,</span>
+<span id="cb1-49"><a href="#cb1-49"></a>    <span class="at">y =</span> <span class="st">"Y"</span></span>
+<span id="cb1-50"><a href="#cb1-50"></a>  ) <span class="sc">+</span></span>
+<span id="cb1-51"><a href="#cb1-51"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>), <span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">5</span>, <span class="dv">5</span>)) <span class="sc">+</span></span>
+<span id="cb1-52"><a href="#cb1-52"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>), <span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">10</span>, <span class="dv">10</span>),</span>
+<span id="cb1-53"><a href="#cb1-53"></a>                     <span class="at">breaks =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">10</span>, <span class="sc">-</span><span class="fl">7.5</span>, <span class="sc">-</span><span class="dv">5</span>, <span class="sc">-</span><span class="fl">2.5</span>, <span class="dv">0</span>, <span class="fl">2.5</span>, <span class="dv">5</span>, <span class="fl">7.5</span>, <span class="dv">10</span>)) <span class="sc">+</span></span>
+<span id="cb1-54"><a href="#cb1-54"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">18</span>) <span class="sc">+</span></span>
+<span id="cb1-55"><a href="#cb1-55"></a>  <span class="fu">theme</span>(<span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># Plot</span></span>
-<span id="cb2-2"><a href="#cb2-2"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb2-3"><a href="#cb2-3"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> D, <span class="at">y =</span> Y), <span class="at">alpha =</span> <span class="fl">0.2</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
-<span id="cb2-4"><a href="#cb2-4"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> D_star, <span class="at">y =</span> Y), <span class="at">alpha =</span> <span class="fl">0.2</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
-<span id="cb2-5"><a href="#cb2-5"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> df_lines, <span class="fu">aes</span>(<span class="at">x =</span> D, <span class="at">y =</span> Y_true), <span class="at">color =</span> <span class="st">"black"</span>, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb2-6"><a href="#cb2-6"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> df_lines, <span class="fu">aes</span>(<span class="at">x =</span> D, <span class="at">y =</span> Y_star), <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb2-7"><a href="#cb2-7"></a>  <span class="fu">labs</span>(</span>
-<span id="cb2-8"><a href="#cb2-8"></a>    <span class="at">x =</span> <span class="st">"D (or D*)"</span>,</span>
-<span id="cb2-9"><a href="#cb2-9"></a>    <span class="at">y =</span> <span class="st">"Y"</span></span>
-<span id="cb2-10"><a href="#cb2-10"></a>  ) <span class="sc">+</span></span>
-<span id="cb2-11"><a href="#cb2-11"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>), <span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">5</span>, <span class="dv">5</span>)) <span class="sc">+</span></span>
-<span id="cb2-12"><a href="#cb2-12"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>), <span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">10</span>, <span class="dv">10</span>),</span>
-<span id="cb2-13"><a href="#cb2-13"></a>                     <span class="at">breaks =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">10</span>, <span class="sc">-</span><span class="fl">7.5</span>, <span class="sc">-</span><span class="dv">5</span>, <span class="sc">-</span><span class="fl">2.5</span>, <span class="dv">0</span>, <span class="fl">2.5</span>, <span class="dv">5</span>, <span class="fl">7.5</span>, <span class="dv">10</span>)) <span class="sc">+</span></span>
-<span id="cb2-14"><a href="#cb2-14"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">18</span>) <span class="sc">+</span></span>
-<span id="cb2-15"><a href="#cb2-15"></a>  <span class="fu">theme</span>(<span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div>
+<div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="tutorial_files/figure-html/sim_attenuation_bias2-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="images/sim_bias.svg" class="img-fluid quarto-figure quarto-figure-center figure-img" width="400"></p>
 </figure>
-</div>
-</div>
 </div>
 <p>In the accompanying plot, the black dots and lines represent the case where the true value of <span class="math inline">\(D\)</span> is observed, while the red points correspond to the error-prone measure <span class="math inline">\(D^*\)</span>. Due to the added noise, the red dots are more horizontally dispersed, although the vertical spread remains similar. This visualization highlights a key empirical consequence of classical measurement error in the treatment variable: it leads to a systematic underestimation of the true effect (true slope is <span class="math inline">\(2\)</span>, while the estimated slope with error-prone variable is <span class="math inline">\(1\)</span>). This pattern is commonly known as <em>attenuation bias</em>, a well-documented result in econometrics literatures <span class="citation" data-cites="wooldridge2012introductory">(<a href="#ref-wooldridge2012introductory" role="doc-biblioref">Wooldridge 2012</a>)</span>.</p>
 </section>
@@ -422,85 +416,81 @@ Y_i = \alpha^{\text{ep}} + \tau^{\text{ep}} D_i + \gamma^{\text{ep}} X_i^* + \va
 <div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>)</span>
-<span id="cb3-2"><a href="#cb3-2"></a>n <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
-<span id="cb3-3"><a href="#cb3-3"></a>tau <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb3-4"><a href="#cb3-4"></a>gamma <span class="ot">&lt;-</span> <span class="dv">2</span></span>
-<span id="cb3-5"><a href="#cb3-5"></a></span>
-<span id="cb3-6"><a href="#cb3-6"></a>simulate_case <span class="ot">&lt;-</span> <span class="cf">function</span>(cor_DX, label) {</span>
-<span id="cb3-7"><a href="#cb3-7"></a>  D <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n)</span>
-<span id="cb3-8"><a href="#cb3-8"></a>  X <span class="ot">&lt;-</span> cor_DX <span class="sc">*</span> D <span class="sc">+</span> <span class="fu">sqrt</span>(<span class="dv">1</span> <span class="sc">-</span> cor_DX<span class="sc">^</span><span class="dv">2</span>) <span class="sc">*</span> <span class="fu">rnorm</span>(n)</span>
-<span id="cb3-9"><a href="#cb3-9"></a>  X_star <span class="ot">&lt;-</span> X <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="at">sd =</span> <span class="dv">1</span>)</span>
-<span id="cb3-10"><a href="#cb3-10"></a>  Y <span class="ot">&lt;-</span> tau <span class="sc">*</span> D <span class="sc">+</span> gamma <span class="sc">*</span> X <span class="sc">+</span> <span class="fu">rnorm</span>(n)</span>
-<span id="cb3-11"><a href="#cb3-11"></a>  </span>
-<span id="cb3-12"><a href="#cb3-12"></a>  <span class="co"># Residualize D w.r.t. X and X*</span></span>
-<span id="cb3-13"><a href="#cb3-13"></a>  D_resid <span class="ot">&lt;-</span> <span class="fu">residuals</span>(<span class="fu">lm</span>(D <span class="sc">~</span> X))</span>
-<span id="cb3-14"><a href="#cb3-14"></a>  D_resid_star <span class="ot">&lt;-</span> <span class="fu">residuals</span>(<span class="fu">lm</span>(D <span class="sc">~</span> X_star))</span>
-<span id="cb3-15"><a href="#cb3-15"></a>  </span>
-<span id="cb3-16"><a href="#cb3-16"></a>  <span class="fu">data.frame</span>(D, X, X_star, Y, label, D_resid, D_resid_star)</span>
-<span id="cb3-17"><a href="#cb3-17"></a>}</span>
-<span id="cb3-18"><a href="#cb3-18"></a></span>
-<span id="cb3-19"><a href="#cb3-19"></a><span class="co"># Simulate and combine</span></span>
-<span id="cb3-20"><a href="#cb3-20"></a>df_all <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
-<span id="cb3-21"><a href="#cb3-21"></a>  <span class="fu">simulate_case</span>(<span class="fl">0.7</span>, <span class="st">"Corr(D,X) = +0.7"</span>),</span>
-<span id="cb3-22"><a href="#cb3-22"></a>  <span class="fu">simulate_case</span>(<span class="sc">-</span><span class="fl">0.7</span>, <span class="st">"Corr(D,X) = -0.7"</span>)</span>
-<span id="cb3-23"><a href="#cb3-23"></a>)</span>
-<span id="cb3-24"><a href="#cb3-24"></a></span>
-<span id="cb3-25"><a href="#cb3-25"></a><span class="co"># Prediction line generator (uses D residualized on true X for plotting)</span></span>
-<span id="cb3-26"><a href="#cb3-26"></a>get_lines_df <span class="ot">&lt;-</span> <span class="cf">function</span>(df, label) {</span>
-<span id="cb3-27"><a href="#cb3-27"></a>  fit_true <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y <span class="sc">~</span> D <span class="sc">+</span> X, <span class="at">data =</span> df)</span>
-<span id="cb3-28"><a href="#cb3-28"></a>  fit_star <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y <span class="sc">~</span> D <span class="sc">+</span> X_star, <span class="at">data =</span> df)</span>
-<span id="cb3-29"><a href="#cb3-29"></a>  </span>
-<span id="cb3-30"><a href="#cb3-30"></a>  d_seq <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fu">min</span>(df<span class="sc">$</span>D), <span class="fu">max</span>(df<span class="sc">$</span>D), <span class="at">length.out =</span> <span class="dv">200</span>)</span>
-<span id="cb3-31"><a href="#cb3-31"></a>  x_fixed <span class="ot">&lt;-</span> <span class="fu">mean</span>(df<span class="sc">$</span>X)</span>
-<span id="cb3-32"><a href="#cb3-32"></a>  x_star_fixed <span class="ot">&lt;-</span> <span class="fu">mean</span>(df<span class="sc">$</span>X_star)</span>
-<span id="cb3-33"><a href="#cb3-33"></a>  </span>
-<span id="cb3-34"><a href="#cb3-34"></a>  pred_true <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit_true, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">D =</span> d_seq, <span class="at">X =</span> x_fixed))</span>
-<span id="cb3-35"><a href="#cb3-35"></a>  pred_star <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit_star, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">D =</span> d_seq, <span class="at">X_star =</span> x_star_fixed))</span>
-<span id="cb3-36"><a href="#cb3-36"></a>  </span>
-<span id="cb3-37"><a href="#cb3-37"></a>  d_resid_seq <span class="ot">&lt;-</span> d_seq <span class="sc">-</span> <span class="fu">mean</span>(df<span class="sc">$</span>D)</span>
-<span id="cb3-38"><a href="#cb3-38"></a>  </span>
-<span id="cb3-39"><a href="#cb3-39"></a>  <span class="fu">data.frame</span>(</span>
-<span id="cb3-40"><a href="#cb3-40"></a>    <span class="at">D_resid =</span> <span class="fu">rep</span>(d_resid_seq, <span class="dv">2</span>),</span>
-<span id="cb3-41"><a href="#cb3-41"></a>    <span class="at">Y =</span> <span class="fu">c</span>(pred_true, pred_star),</span>
-<span id="cb3-42"><a href="#cb3-42"></a>    <span class="at">Model =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"True X"</span>, <span class="st">"Measured X*"</span>), <span class="at">each =</span> <span class="fu">length</span>(d_seq)),</span>
-<span id="cb3-43"><a href="#cb3-43"></a>    <span class="at">label =</span> label</span>
-<span id="cb3-44"><a href="#cb3-44"></a>  )</span>
-<span id="cb3-45"><a href="#cb3-45"></a>}</span>
-<span id="cb3-46"><a href="#cb3-46"></a></span>
-<span id="cb3-47"><a href="#cb3-47"></a><span class="co"># Combine prediction lines</span></span>
-<span id="cb3-48"><a href="#cb3-48"></a>df_lines <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
-<span id="cb3-49"><a href="#cb3-49"></a>  <span class="fu">get_lines_df</span>(df_all <span class="sc">|&gt;</span> <span class="fu">filter</span>(label <span class="sc">==</span> <span class="st">"Corr(D,X) = +0.7"</span>), <span class="st">"Corr(D,X) = +0.7"</span>),</span>
-<span id="cb3-50"><a href="#cb3-50"></a>  <span class="fu">get_lines_df</span>(df_all <span class="sc">|&gt;</span> <span class="fu">filter</span>(label <span class="sc">==</span> <span class="st">"Corr(D,X) = -0.7"</span>), <span class="st">"Corr(D,X) = -0.7"</span>)</span>
-<span id="cb3-51"><a href="#cb3-51"></a>)</span>
-<span id="cb3-52"><a href="#cb3-52"></a></span>
-<span id="cb3-53"><a href="#cb3-53"></a><span class="co"># Plot: black = D residualized on X; red = D residualized on X*</span></span>
-<span id="cb3-54"><a href="#cb3-54"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb3-55"><a href="#cb3-55"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> df_all, <span class="fu">aes</span>(<span class="at">x =</span> D_resid, <span class="at">y =</span> Y), <span class="at">alpha =</span> <span class="fl">0.1</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
-<span id="cb3-56"><a href="#cb3-56"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> df_all, <span class="fu">aes</span>(<span class="at">x =</span> D_resid_star, <span class="at">y =</span> Y), <span class="at">alpha =</span> <span class="fl">0.1</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
-<span id="cb3-57"><a href="#cb3-57"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> df_lines, <span class="fu">aes</span>(<span class="at">x =</span> D_resid, <span class="at">y =</span> Y, <span class="at">color =</span> Model, <span class="at">linetype =</span> Model), <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb3-58"><a href="#cb3-58"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> label) <span class="sc">+</span></span>
-<span id="cb3-59"><a href="#cb3-59"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"True X"</span> <span class="ot">=</span> <span class="st">"black"</span>, <span class="st">"Measured X*"</span> <span class="ot">=</span> <span class="st">"red"</span>)) <span class="sc">+</span></span>
-<span id="cb3-60"><a href="#cb3-60"></a>  <span class="fu">scale_linetype_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"True X"</span> <span class="ot">=</span> <span class="st">"solid"</span>, <span class="st">"Measured X*"</span> <span class="ot">=</span> <span class="st">"solid"</span>)) <span class="sc">+</span></span>
-<span id="cb3-61"><a href="#cb3-61"></a>  <span class="fu">labs</span>(</span>
-<span id="cb3-62"><a href="#cb3-62"></a>    <span class="at">x =</span> <span class="st">"Residualized D"</span>, <span class="at">y =</span> <span class="st">"Y"</span>, <span class="at">color =</span> <span class="cn">NULL</span>, <span class="at">linetype =</span> <span class="cn">NULL</span></span>
-<span id="cb3-63"><a href="#cb3-63"></a>  ) <span class="sc">+</span></span>
-<span id="cb3-64"><a href="#cb3-64"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>), <span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>, <span class="dv">3</span>)) <span class="sc">+</span></span>
-<span id="cb3-65"><a href="#cb3-65"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>), <span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">10</span>, <span class="dv">10</span>)) <span class="sc">+</span></span>
-<span id="cb3-66"><a href="#cb3-66"></a>  <span class="fu">coord_cartesian</span>(<span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">2.5</span>, <span class="fl">2.5</span> )) <span class="sc">+</span></span>
-<span id="cb3-67"><a href="#cb3-67"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">18</span>) <span class="sc">+</span></span>
-<span id="cb3-68"><a href="#cb3-68"></a>  <span class="fu">theme</span>(<span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb3-69"><a href="#cb3-69"></a>        <span class="at">legend.position =</span> <span class="st">"none"</span>)</span>
-<span id="cb3-70"><a href="#cb3-70"></a></span>
-<span id="cb3-71"><a href="#cb3-71"></a><span class="fu">print</span>(p)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>)</span>
+<span id="cb2-2"><a href="#cb2-2"></a>n <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a>tau <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a>gamma <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a></span>
+<span id="cb2-6"><a href="#cb2-6"></a>simulate_case <span class="ot">&lt;-</span> <span class="cf">function</span>(cor_DX, label) {</span>
+<span id="cb2-7"><a href="#cb2-7"></a>  D <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb2-8"><a href="#cb2-8"></a>  X <span class="ot">&lt;-</span> cor_DX <span class="sc">*</span> D <span class="sc">+</span> <span class="fu">sqrt</span>(<span class="dv">1</span> <span class="sc">-</span> cor_DX<span class="sc">^</span><span class="dv">2</span>) <span class="sc">*</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb2-9"><a href="#cb2-9"></a>  X_star <span class="ot">&lt;-</span> X <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="at">sd =</span> <span class="dv">1</span>)</span>
+<span id="cb2-10"><a href="#cb2-10"></a>  Y <span class="ot">&lt;-</span> tau <span class="sc">*</span> D <span class="sc">+</span> gamma <span class="sc">*</span> X <span class="sc">+</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb2-11"><a href="#cb2-11"></a>  </span>
+<span id="cb2-12"><a href="#cb2-12"></a>  <span class="co"># Residualize D w.r.t. X and X*</span></span>
+<span id="cb2-13"><a href="#cb2-13"></a>  D_resid <span class="ot">&lt;-</span> <span class="fu">residuals</span>(<span class="fu">lm</span>(D <span class="sc">~</span> X))</span>
+<span id="cb2-14"><a href="#cb2-14"></a>  D_resid_star <span class="ot">&lt;-</span> <span class="fu">residuals</span>(<span class="fu">lm</span>(D <span class="sc">~</span> X_star))</span>
+<span id="cb2-15"><a href="#cb2-15"></a>  </span>
+<span id="cb2-16"><a href="#cb2-16"></a>  <span class="fu">data.frame</span>(D, X, X_star, Y, label, D_resid, D_resid_star)</span>
+<span id="cb2-17"><a href="#cb2-17"></a>}</span>
+<span id="cb2-18"><a href="#cb2-18"></a></span>
+<span id="cb2-19"><a href="#cb2-19"></a><span class="co"># Simulate and combine</span></span>
+<span id="cb2-20"><a href="#cb2-20"></a>df_all <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb2-21"><a href="#cb2-21"></a>  <span class="fu">simulate_case</span>(<span class="fl">0.7</span>, <span class="st">"Corr(D,X) = +0.7"</span>),</span>
+<span id="cb2-22"><a href="#cb2-22"></a>  <span class="fu">simulate_case</span>(<span class="sc">-</span><span class="fl">0.7</span>, <span class="st">"Corr(D,X) = -0.7"</span>)</span>
+<span id="cb2-23"><a href="#cb2-23"></a>)</span>
+<span id="cb2-24"><a href="#cb2-24"></a></span>
+<span id="cb2-25"><a href="#cb2-25"></a><span class="co"># Prediction line generator (uses D residualized on true X for plotting)</span></span>
+<span id="cb2-26"><a href="#cb2-26"></a>get_lines_df <span class="ot">&lt;-</span> <span class="cf">function</span>(df, label) {</span>
+<span id="cb2-27"><a href="#cb2-27"></a>  fit_true <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y <span class="sc">~</span> D <span class="sc">+</span> X, <span class="at">data =</span> df)</span>
+<span id="cb2-28"><a href="#cb2-28"></a>  fit_star <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y <span class="sc">~</span> D <span class="sc">+</span> X_star, <span class="at">data =</span> df)</span>
+<span id="cb2-29"><a href="#cb2-29"></a>  </span>
+<span id="cb2-30"><a href="#cb2-30"></a>  d_seq <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fu">min</span>(df<span class="sc">$</span>D), <span class="fu">max</span>(df<span class="sc">$</span>D), <span class="at">length.out =</span> <span class="dv">200</span>)</span>
+<span id="cb2-31"><a href="#cb2-31"></a>  x_fixed <span class="ot">&lt;-</span> <span class="fu">mean</span>(df<span class="sc">$</span>X)</span>
+<span id="cb2-32"><a href="#cb2-32"></a>  x_star_fixed <span class="ot">&lt;-</span> <span class="fu">mean</span>(df<span class="sc">$</span>X_star)</span>
+<span id="cb2-33"><a href="#cb2-33"></a>  </span>
+<span id="cb2-34"><a href="#cb2-34"></a>  pred_true <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit_true, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">D =</span> d_seq, <span class="at">X =</span> x_fixed))</span>
+<span id="cb2-35"><a href="#cb2-35"></a>  pred_star <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit_star, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">D =</span> d_seq, <span class="at">X_star =</span> x_star_fixed))</span>
+<span id="cb2-36"><a href="#cb2-36"></a>  </span>
+<span id="cb2-37"><a href="#cb2-37"></a>  d_resid_seq <span class="ot">&lt;-</span> d_seq <span class="sc">-</span> <span class="fu">mean</span>(df<span class="sc">$</span>D)</span>
+<span id="cb2-38"><a href="#cb2-38"></a>  </span>
+<span id="cb2-39"><a href="#cb2-39"></a>  <span class="fu">data.frame</span>(</span>
+<span id="cb2-40"><a href="#cb2-40"></a>    <span class="at">D_resid =</span> <span class="fu">rep</span>(d_resid_seq, <span class="dv">2</span>),</span>
+<span id="cb2-41"><a href="#cb2-41"></a>    <span class="at">Y =</span> <span class="fu">c</span>(pred_true, pred_star),</span>
+<span id="cb2-42"><a href="#cb2-42"></a>    <span class="at">Model =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"True X"</span>, <span class="st">"Measured X*"</span>), <span class="at">each =</span> <span class="fu">length</span>(d_seq)),</span>
+<span id="cb2-43"><a href="#cb2-43"></a>    <span class="at">label =</span> label</span>
+<span id="cb2-44"><a href="#cb2-44"></a>  )</span>
+<span id="cb2-45"><a href="#cb2-45"></a>}</span>
+<span id="cb2-46"><a href="#cb2-46"></a></span>
+<span id="cb2-47"><a href="#cb2-47"></a><span class="co"># Combine prediction lines</span></span>
+<span id="cb2-48"><a href="#cb2-48"></a>df_lines <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb2-49"><a href="#cb2-49"></a>  <span class="fu">get_lines_df</span>(df_all <span class="sc">|&gt;</span> <span class="fu">filter</span>(label <span class="sc">==</span> <span class="st">"Corr(D,X) = +0.7"</span>), <span class="st">"Corr(D,X) = +0.7"</span>),</span>
+<span id="cb2-50"><a href="#cb2-50"></a>  <span class="fu">get_lines_df</span>(df_all <span class="sc">|&gt;</span> <span class="fu">filter</span>(label <span class="sc">==</span> <span class="st">"Corr(D,X) = -0.7"</span>), <span class="st">"Corr(D,X) = -0.7"</span>)</span>
+<span id="cb2-51"><a href="#cb2-51"></a>)</span>
+<span id="cb2-52"><a href="#cb2-52"></a></span>
+<span id="cb2-53"><a href="#cb2-53"></a><span class="co"># Plot: black = D residualized on X; red = D residualized on X*</span></span>
+<span id="cb2-54"><a href="#cb2-54"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb2-55"><a href="#cb2-55"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> df_all, <span class="fu">aes</span>(<span class="at">x =</span> D_resid, <span class="at">y =</span> Y), <span class="at">alpha =</span> <span class="fl">0.1</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb2-56"><a href="#cb2-56"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> df_all, <span class="fu">aes</span>(<span class="at">x =</span> D_resid_star, <span class="at">y =</span> Y), <span class="at">alpha =</span> <span class="fl">0.1</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb2-57"><a href="#cb2-57"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> df_lines, <span class="fu">aes</span>(<span class="at">x =</span> D_resid, <span class="at">y =</span> Y, <span class="at">color =</span> Model, <span class="at">linetype =</span> Model), <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb2-58"><a href="#cb2-58"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> label) <span class="sc">+</span></span>
+<span id="cb2-59"><a href="#cb2-59"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"True X"</span> <span class="ot">=</span> <span class="st">"black"</span>, <span class="st">"Measured X*"</span> <span class="ot">=</span> <span class="st">"red"</span>)) <span class="sc">+</span></span>
+<span id="cb2-60"><a href="#cb2-60"></a>  <span class="fu">scale_linetype_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"True X"</span> <span class="ot">=</span> <span class="st">"solid"</span>, <span class="st">"Measured X*"</span> <span class="ot">=</span> <span class="st">"solid"</span>)) <span class="sc">+</span></span>
+<span id="cb2-61"><a href="#cb2-61"></a>  <span class="fu">labs</span>(</span>
+<span id="cb2-62"><a href="#cb2-62"></a>    <span class="at">x =</span> <span class="st">"Residualized D"</span>, <span class="at">y =</span> <span class="st">"Y"</span>, <span class="at">color =</span> <span class="cn">NULL</span>, <span class="at">linetype =</span> <span class="cn">NULL</span></span>
+<span id="cb2-63"><a href="#cb2-63"></a>  ) <span class="sc">+</span></span>
+<span id="cb2-64"><a href="#cb2-64"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>), <span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>, <span class="dv">3</span>)) <span class="sc">+</span></span>
+<span id="cb2-65"><a href="#cb2-65"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>), <span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">10</span>, <span class="dv">10</span>)) <span class="sc">+</span></span>
+<span id="cb2-66"><a href="#cb2-66"></a>  <span class="fu">coord_cartesian</span>(<span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">2.5</span>, <span class="fl">2.5</span> )) <span class="sc">+</span></span>
+<span id="cb2-67"><a href="#cb2-67"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">18</span>) <span class="sc">+</span></span>
+<span id="cb2-68"><a href="#cb2-68"></a>  <span class="fu">theme</span>(<span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb2-69"><a href="#cb2-69"></a>        <span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output-display">
+</div>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="tutorial_files/figure-html/sim_confounder-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="576"></p>
+<p><img src="images/sim_confounder.svg" class="img-fluid quarto-figure quarto-figure-center figure-img" width="600"></p>
 </figure>
-</div>
-</div>
 </div>
 <p>The results reveal striking asymmetries. When <span class="math inline">\(D\)</span> and <span class="math inline">\(X\)</span> are negatively correlated, the estimated treatment effect is biased downward, underestimating the true effect. In contrast, when the correlation is positive, the bias shifts upward, leading to an overestimation of the effect. Notably, the measurement error process is held constant across both cases—simple additive Gaussian noise—yet its consequences for the treatment effect estimation are diametrically opposed.</p>
 </section>
@@ -539,84 +529,80 @@ Y_i = \alpha + \tau \widehat{D}_i + \gamma X_i + \varepsilon_i.
 <div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>)</span>
-<span id="cb4-2"><a href="#cb4-2"></a></span>
-<span id="cb4-3"><a href="#cb4-3"></a><span class="co"># Parameters</span></span>
-<span id="cb4-4"><a href="#cb4-4"></a>N <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
-<span id="cb4-5"><a href="#cb4-5"></a>n_val <span class="ot">&lt;-</span> <span class="dv">200</span></span>
-<span id="cb4-6"><a href="#cb4-6"></a>B <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
-<span id="cb4-7"><a href="#cb4-7"></a>tau <span class="ot">&lt;-</span> <span class="dv">2</span></span>
-<span id="cb4-8"><a href="#cb4-8"></a>gamma <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb4-9"><a href="#cb4-9"></a>alpha <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb4-10"><a href="#cb4-10"></a>delta_0 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb4-11"><a href="#cb4-11"></a>delta_1 <span class="ot">&lt;-</span> <span class="fl">1.5</span>  <span class="co"># Strength of confounding (X -&gt; D)</span></span>
-<span id="cb4-12"><a href="#cb4-12"></a></span>
-<span id="cb4-13"><a href="#cb4-13"></a><span class="co"># Simulate data</span></span>
-<span id="cb4-14"><a href="#cb4-14"></a>X <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(N)</span>
-<span id="cb4-15"><a href="#cb4-15"></a>prob_D <span class="ot">&lt;-</span> <span class="fu">plogis</span>(delta_0 <span class="sc">+</span> delta_1 <span class="sc">*</span> X)  <span class="co"># logistic(X) for treatment probability</span></span>
-<span id="cb4-16"><a href="#cb4-16"></a>D <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(N, <span class="dv">1</span>, prob_D)                <span class="co"># True treatment influenced by X</span></span>
-<span id="cb4-17"><a href="#cb4-17"></a>Y <span class="ot">&lt;-</span> alpha <span class="sc">+</span> tau <span class="sc">*</span> D <span class="sc">+</span> gamma <span class="sc">*</span> X <span class="sc">+</span> <span class="fu">rnorm</span>(N)</span>
-<span id="cb4-18"><a href="#cb4-18"></a></span>
-<span id="cb4-19"><a href="#cb4-19"></a><span class="co"># Introduce 30% random flipping (misclassification)</span></span>
-<span id="cb4-20"><a href="#cb4-20"></a>D_star <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">runif</span>(N) <span class="sc">&lt;</span> <span class="fl">0.3</span>, <span class="dv">1</span> <span class="sc">-</span> D, D)</span>
-<span id="cb4-21"><a href="#cb4-21"></a></span>
-<span id="cb4-22"><a href="#cb4-22"></a><span class="co"># Validation indicator</span></span>
-<span id="cb4-23"><a href="#cb4-23"></a>S <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">0</span>, N)</span>
-<span id="cb4-24"><a href="#cb4-24"></a>val_idx <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span>N, n_val)</span>
-<span id="cb4-25"><a href="#cb4-25"></a>S[val_idx] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb4-26"><a href="#cb4-26"></a></span>
-<span id="cb4-27"><a href="#cb4-27"></a><span class="co"># Bootstrap storage</span></span>
-<span id="cb4-28"><a href="#cb4-28"></a>est_naive <span class="ot">&lt;-</span> <span class="fu">numeric</span>(B)</span>
-<span id="cb4-29"><a href="#cb4-29"></a>est_rc <span class="ot">&lt;-</span> <span class="fu">numeric</span>(B)</span>
-<span id="cb4-30"><a href="#cb4-30"></a></span>
-<span id="cb4-31"><a href="#cb4-31"></a><span class="cf">for</span> (b <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>B) {</span>
-<span id="cb4-32"><a href="#cb4-32"></a>  idx <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span>N, N, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb4-33"><a href="#cb4-33"></a>  </span>
-<span id="cb4-34"><a href="#cb4-34"></a>  X_b <span class="ot">&lt;-</span> X[idx]</span>
-<span id="cb4-35"><a href="#cb4-35"></a>  D_b <span class="ot">&lt;-</span> D[idx]</span>
-<span id="cb4-36"><a href="#cb4-36"></a>  D_star_b <span class="ot">&lt;-</span> D_star[idx]</span>
-<span id="cb4-37"><a href="#cb4-37"></a>  Y_b <span class="ot">&lt;-</span> Y[idx]</span>
-<span id="cb4-38"><a href="#cb4-38"></a>  S_b <span class="ot">&lt;-</span> S[idx]</span>
-<span id="cb4-39"><a href="#cb4-39"></a>  </span>
-<span id="cb4-40"><a href="#cb4-40"></a>  <span class="co"># Naive regression</span></span>
-<span id="cb4-41"><a href="#cb4-41"></a>  fit_naive <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y_b <span class="sc">~</span> D_star_b <span class="sc">+</span> X_b)</span>
-<span id="cb4-42"><a href="#cb4-42"></a>  est_naive[b] <span class="ot">&lt;-</span> <span class="fu">coef</span>(fit_naive)[<span class="st">"D_star_b"</span>]</span>
-<span id="cb4-43"><a href="#cb4-43"></a>  </span>
-<span id="cb4-44"><a href="#cb4-44"></a>  <span class="co"># Logistic regression calibration in validation sample</span></span>
-<span id="cb4-45"><a href="#cb4-45"></a>  calib_fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(D_b <span class="sc">~</span> D_star_b <span class="sc">+</span> X_b, <span class="at">subset =</span> S_b <span class="sc">==</span> <span class="dv">1</span>, <span class="at">family =</span> binomial)</span>
-<span id="cb4-46"><a href="#cb4-46"></a>  D_hat_b <span class="ot">&lt;-</span> <span class="fu">predict</span>(calib_fit, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">D_star_b =</span> D_star_b, <span class="at">X_b =</span> X_b), <span class="at">type =</span> <span class="st">"response"</span>)</span>
-<span id="cb4-47"><a href="#cb4-47"></a>  </span>
-<span id="cb4-48"><a href="#cb4-48"></a>  <span class="co"># RC regression with imputed treatment probability</span></span>
-<span id="cb4-49"><a href="#cb4-49"></a>  fit_rc <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y_b <span class="sc">~</span> D_hat_b <span class="sc">+</span> X_b)</span>
-<span id="cb4-50"><a href="#cb4-50"></a>  est_rc[b] <span class="ot">&lt;-</span> <span class="fu">coef</span>(fit_rc)[<span class="st">"D_hat_b"</span>]</span>
-<span id="cb4-51"><a href="#cb4-51"></a>}</span>
-<span id="cb4-52"><a href="#cb4-52"></a></span>
-<span id="cb4-53"><a href="#cb4-53"></a><span class="co"># Combine and plot</span></span>
-<span id="cb4-54"><a href="#cb4-54"></a>df_plot <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb4-55"><a href="#cb4-55"></a>  <span class="at">estimate =</span> <span class="fu">c</span>(est_naive, est_rc),</span>
-<span id="cb4-56"><a href="#cb4-56"></a>  <span class="at">method =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"Naive (D*)"</span>, <span class="st">"Regression Calibration"</span>), <span class="at">each =</span> B)</span>
-<span id="cb4-57"><a href="#cb4-57"></a>)</span>
-<span id="cb4-58"><a href="#cb4-58"></a></span>
-<span id="cb4-59"><a href="#cb4-59"></a><span class="co"># Plot</span></span>
-<span id="cb4-60"><a href="#cb4-60"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(df_plot, <span class="fu">aes</span>(<span class="at">x =</span> estimate, <span class="at">fill =</span> method)) <span class="sc">+</span></span>
-<span id="cb4-61"><a href="#cb4-61"></a>  <span class="fu">geom_histogram</span>(<span class="at">colour =</span> <span class="st">"white"</span>, <span class="at">bins =</span> <span class="dv">40</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">position =</span> <span class="st">"identity"</span>) <span class="sc">+</span></span>
-<span id="cb4-62"><a href="#cb4-62"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> tau, <span class="at">linetype =</span> <span class="dv">3</span>, <span class="at">size =</span> <span class="fl">1.5</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
-<span id="cb4-63"><a href="#cb4-63"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> method, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
-<span id="cb4-64"><a href="#cb4-64"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Estimated Treatment Effect"</span>, <span class="at">y =</span> <span class="st">"Count"</span>) <span class="sc">+</span></span>
-<span id="cb4-65"><a href="#cb4-65"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">3.5</span>)) <span class="sc">+</span></span>
-<span id="cb4-66"><a href="#cb4-66"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">18</span>) <span class="sc">+</span></span>
-<span id="cb4-67"><a href="#cb4-67"></a>  <span class="fu">theme</span>(<span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb4-68"><a href="#cb4-68"></a>        <span class="at">legend.position =</span> <span class="st">"none"</span>)</span>
-<span id="cb4-69"><a href="#cb4-69"></a></span>
-<span id="cb4-70"><a href="#cb4-70"></a><span class="fu">print</span>(p)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>)</span>
+<span id="cb3-2"><a href="#cb3-2"></a></span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="co"># Parameters</span></span>
+<span id="cb3-4"><a href="#cb3-4"></a>N <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a>n_val <span class="ot">&lt;-</span> <span class="dv">200</span></span>
+<span id="cb3-6"><a href="#cb3-6"></a>B <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb3-7"><a href="#cb3-7"></a>tau <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb3-8"><a href="#cb3-8"></a>gamma <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb3-9"><a href="#cb3-9"></a>alpha <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb3-10"><a href="#cb3-10"></a>delta_0 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb3-11"><a href="#cb3-11"></a>delta_1 <span class="ot">&lt;-</span> <span class="fl">1.5</span>  <span class="co"># Strength of confounding (X -&gt; D)</span></span>
+<span id="cb3-12"><a href="#cb3-12"></a></span>
+<span id="cb3-13"><a href="#cb3-13"></a><span class="co"># Simulate data</span></span>
+<span id="cb3-14"><a href="#cb3-14"></a>X <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(N)</span>
+<span id="cb3-15"><a href="#cb3-15"></a>prob_D <span class="ot">&lt;-</span> <span class="fu">plogis</span>(delta_0 <span class="sc">+</span> delta_1 <span class="sc">*</span> X)  <span class="co"># logistic(X) for treatment probability</span></span>
+<span id="cb3-16"><a href="#cb3-16"></a>D <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(N, <span class="dv">1</span>, prob_D)                <span class="co"># True treatment influenced by X</span></span>
+<span id="cb3-17"><a href="#cb3-17"></a>Y <span class="ot">&lt;-</span> alpha <span class="sc">+</span> tau <span class="sc">*</span> D <span class="sc">+</span> gamma <span class="sc">*</span> X <span class="sc">+</span> <span class="fu">rnorm</span>(N)</span>
+<span id="cb3-18"><a href="#cb3-18"></a></span>
+<span id="cb3-19"><a href="#cb3-19"></a><span class="co"># Introduce 30% random flipping (misclassification)</span></span>
+<span id="cb3-20"><a href="#cb3-20"></a>D_star <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">runif</span>(N) <span class="sc">&lt;</span> <span class="fl">0.3</span>, <span class="dv">1</span> <span class="sc">-</span> D, D)</span>
+<span id="cb3-21"><a href="#cb3-21"></a></span>
+<span id="cb3-22"><a href="#cb3-22"></a><span class="co"># Validation indicator</span></span>
+<span id="cb3-23"><a href="#cb3-23"></a>S <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">0</span>, N)</span>
+<span id="cb3-24"><a href="#cb3-24"></a>val_idx <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span>N, n_val)</span>
+<span id="cb3-25"><a href="#cb3-25"></a>S[val_idx] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb3-26"><a href="#cb3-26"></a></span>
+<span id="cb3-27"><a href="#cb3-27"></a><span class="co"># Bootstrap storage</span></span>
+<span id="cb3-28"><a href="#cb3-28"></a>est_naive <span class="ot">&lt;-</span> <span class="fu">numeric</span>(B)</span>
+<span id="cb3-29"><a href="#cb3-29"></a>est_rc <span class="ot">&lt;-</span> <span class="fu">numeric</span>(B)</span>
+<span id="cb3-30"><a href="#cb3-30"></a></span>
+<span id="cb3-31"><a href="#cb3-31"></a><span class="cf">for</span> (b <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>B) {</span>
+<span id="cb3-32"><a href="#cb3-32"></a>  idx <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span>N, N, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb3-33"><a href="#cb3-33"></a>  </span>
+<span id="cb3-34"><a href="#cb3-34"></a>  X_b <span class="ot">&lt;-</span> X[idx]</span>
+<span id="cb3-35"><a href="#cb3-35"></a>  D_b <span class="ot">&lt;-</span> D[idx]</span>
+<span id="cb3-36"><a href="#cb3-36"></a>  D_star_b <span class="ot">&lt;-</span> D_star[idx]</span>
+<span id="cb3-37"><a href="#cb3-37"></a>  Y_b <span class="ot">&lt;-</span> Y[idx]</span>
+<span id="cb3-38"><a href="#cb3-38"></a>  S_b <span class="ot">&lt;-</span> S[idx]</span>
+<span id="cb3-39"><a href="#cb3-39"></a>  </span>
+<span id="cb3-40"><a href="#cb3-40"></a>  <span class="co"># Naive regression</span></span>
+<span id="cb3-41"><a href="#cb3-41"></a>  fit_naive <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y_b <span class="sc">~</span> D_star_b <span class="sc">+</span> X_b)</span>
+<span id="cb3-42"><a href="#cb3-42"></a>  est_naive[b] <span class="ot">&lt;-</span> <span class="fu">coef</span>(fit_naive)[<span class="st">"D_star_b"</span>]</span>
+<span id="cb3-43"><a href="#cb3-43"></a>  </span>
+<span id="cb3-44"><a href="#cb3-44"></a>  <span class="co"># Logistic regression calibration in validation sample</span></span>
+<span id="cb3-45"><a href="#cb3-45"></a>  calib_fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(D_b <span class="sc">~</span> D_star_b <span class="sc">+</span> X_b, <span class="at">subset =</span> S_b <span class="sc">==</span> <span class="dv">1</span>, <span class="at">family =</span> binomial)</span>
+<span id="cb3-46"><a href="#cb3-46"></a>  D_hat_b <span class="ot">&lt;-</span> <span class="fu">predict</span>(calib_fit, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">D_star_b =</span> D_star_b, <span class="at">X_b =</span> X_b), <span class="at">type =</span> <span class="st">"response"</span>)</span>
+<span id="cb3-47"><a href="#cb3-47"></a>  </span>
+<span id="cb3-48"><a href="#cb3-48"></a>  <span class="co"># RC regression with imputed treatment probability</span></span>
+<span id="cb3-49"><a href="#cb3-49"></a>  fit_rc <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y_b <span class="sc">~</span> D_hat_b <span class="sc">+</span> X_b)</span>
+<span id="cb3-50"><a href="#cb3-50"></a>  est_rc[b] <span class="ot">&lt;-</span> <span class="fu">coef</span>(fit_rc)[<span class="st">"D_hat_b"</span>]</span>
+<span id="cb3-51"><a href="#cb3-51"></a>}</span>
+<span id="cb3-52"><a href="#cb3-52"></a></span>
+<span id="cb3-53"><a href="#cb3-53"></a><span class="co"># Combine and plot</span></span>
+<span id="cb3-54"><a href="#cb3-54"></a>df_plot <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb3-55"><a href="#cb3-55"></a>  <span class="at">estimate =</span> <span class="fu">c</span>(est_naive, est_rc),</span>
+<span id="cb3-56"><a href="#cb3-56"></a>  <span class="at">method =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"Naive (D*)"</span>, <span class="st">"Regression Calibration"</span>), <span class="at">each =</span> B)</span>
+<span id="cb3-57"><a href="#cb3-57"></a>)</span>
+<span id="cb3-58"><a href="#cb3-58"></a></span>
+<span id="cb3-59"><a href="#cb3-59"></a><span class="co"># Plot</span></span>
+<span id="cb3-60"><a href="#cb3-60"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(df_plot, <span class="fu">aes</span>(<span class="at">x =</span> estimate, <span class="at">fill =</span> method)) <span class="sc">+</span></span>
+<span id="cb3-61"><a href="#cb3-61"></a>  <span class="fu">geom_histogram</span>(<span class="at">colour =</span> <span class="st">"white"</span>, <span class="at">bins =</span> <span class="dv">40</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">position =</span> <span class="st">"identity"</span>) <span class="sc">+</span></span>
+<span id="cb3-62"><a href="#cb3-62"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> tau, <span class="at">linetype =</span> <span class="dv">3</span>, <span class="at">size =</span> <span class="fl">1.5</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb3-63"><a href="#cb3-63"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> method, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb3-64"><a href="#cb3-64"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Estimated Treatment Effect"</span>, <span class="at">y =</span> <span class="st">"Count"</span>) <span class="sc">+</span></span>
+<span id="cb3-65"><a href="#cb3-65"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">3.5</span>)) <span class="sc">+</span></span>
+<span id="cb3-66"><a href="#cb3-66"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">18</span>) <span class="sc">+</span></span>
+<span id="cb3-67"><a href="#cb3-67"></a>  <span class="fu">theme</span>(<span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb3-68"><a href="#cb3-68"></a>        <span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output-display">
+</div>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="tutorial_files/figure-html/sim_reg_calibration-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="576"></p>
+<p><img src="images/sim_reg_calibration.svg" class="img-fluid quarto-figure quarto-figure-center figure-img" width="800"></p>
 </figure>
-</div>
-</div>
 </div>
 </section>
 <section id="control-variates-approach" class="level2">
@@ -636,108 +622,104 @@ Y_i = \alpha + \tau \widehat{D}_i + \gamma X_i + \varepsilon_i.
 <div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>)</span>
-<span id="cb5-2"><a href="#cb5-2"></a></span>
-<span id="cb5-3"><a href="#cb5-3"></a>simulate_once <span class="ot">&lt;-</span> <span class="cf">function</span>(n, val_frac, <span class="at">misclass_rate =</span> <span class="fl">0.15</span>) {</span>
-<span id="cb5-4"><a href="#cb5-4"></a>  X1 <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n)</span>
-<span id="cb5-5"><a href="#cb5-5"></a>  X2 <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n)</span>
-<span id="cb5-6"><a href="#cb5-6"></a>  p <span class="ot">&lt;-</span> <span class="fu">plogis</span>(X1 <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> X2)</span>
-<span id="cb5-7"><a href="#cb5-7"></a>  D <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, p)</span>
-<span id="cb5-8"><a href="#cb5-8"></a>  D_star <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">runif</span>(n) <span class="sc">&lt;</span> misclass_rate, <span class="dv">1</span> <span class="sc">-</span> D, D)</span>
-<span id="cb5-9"><a href="#cb5-9"></a>  </span>
-<span id="cb5-10"><a href="#cb5-10"></a>  <span class="co"># Define potential outcomes</span></span>
-<span id="cb5-11"><a href="#cb5-11"></a>  Y0 <span class="ot">&lt;-</span> <span class="fu">exp</span>(X1) <span class="sc">/</span> <span class="dv">4</span> <span class="sc">+</span> <span class="fu">sin</span>(<span class="dv">2</span> <span class="sc">*</span> X2) <span class="sc">+</span> <span class="fu">rnorm</span>(n)</span>
-<span id="cb5-12"><a href="#cb5-12"></a>  Y1 <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">+</span> <span class="fu">exp</span>(X1) <span class="sc">/</span> <span class="dv">4</span> <span class="sc">+</span> <span class="fu">sin</span>(<span class="dv">2</span> <span class="sc">*</span> X2) <span class="sc">+</span> <span class="fu">rnorm</span>(n)  <span class="co"># add ATE = 2</span></span>
-<span id="cb5-13"><a href="#cb5-13"></a>  </span>
-<span id="cb5-14"><a href="#cb5-14"></a>  <span class="co"># Reveal observed outcome</span></span>
-<span id="cb5-15"><a href="#cb5-15"></a>  Y <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(D <span class="sc">==</span> <span class="dv">1</span>, Y1, Y0)</span>
-<span id="cb5-16"><a href="#cb5-16"></a>  </span>
-<span id="cb5-17"><a href="#cb5-17"></a>  <span class="co"># Validation indicator</span></span>
-<span id="cb5-18"><a href="#cb5-18"></a>  S <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">0</span>, n)</span>
-<span id="cb5-19"><a href="#cb5-19"></a>  S[<span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span>n, <span class="at">size =</span> n <span class="sc">*</span> val_frac)] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb5-20"><a href="#cb5-20"></a>  </span>
-<span id="cb5-21"><a href="#cb5-21"></a>  df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(Y, D, D_star, X1, X2, S)</span>
-<span id="cb5-22"><a href="#cb5-22"></a>  </span>
-<span id="cb5-23"><a href="#cb5-23"></a>  tau_val <span class="ot">&lt;-</span> <span class="fu">coef</span>(<span class="fu">lm</span>(Y <span class="sc">~</span> D <span class="sc">+</span> X1 <span class="sc">+</span> X2, <span class="at">data =</span> df <span class="sc">|&gt;</span> <span class="fu">filter</span>(S <span class="sc">==</span> <span class="dv">1</span>)))[<span class="st">"D"</span>]</span>
-<span id="cb5-24"><a href="#cb5-24"></a>  tau_ep_main <span class="ot">&lt;-</span> <span class="fu">coef</span>(<span class="fu">lm</span>(Y <span class="sc">~</span> D_star <span class="sc">+</span> X1 <span class="sc">+</span> X2, <span class="at">data =</span> df))[<span class="st">"D_star"</span>]</span>
-<span id="cb5-25"><a href="#cb5-25"></a>  tau_ep_val <span class="ot">&lt;-</span> <span class="fu">coef</span>(<span class="fu">lm</span>(Y <span class="sc">~</span> D_star <span class="sc">+</span> X1 <span class="sc">+</span> X2, <span class="at">data =</span> df <span class="sc">|&gt;</span> <span class="fu">filter</span>(S <span class="sc">==</span> <span class="dv">1</span>)))[<span class="st">"D_star"</span>]</span>
-<span id="cb5-26"><a href="#cb5-26"></a>  </span>
-<span id="cb5-27"><a href="#cb5-27"></a>  <span class="fu">setNames</span>(<span class="fu">c</span>(tau_val, tau_ep_main, tau_ep_val),</span>
-<span id="cb5-28"><a href="#cb5-28"></a>           <span class="fu">c</span>(<span class="st">"tau_val"</span>, <span class="st">"tau_ep_main"</span>, <span class="st">"tau_ep_val"</span>))</span>
-<span id="cb5-29"><a href="#cb5-29"></a>}</span>
-<span id="cb5-30"><a href="#cb5-30"></a></span>
-<span id="cb5-31"><a href="#cb5-31"></a><span class="co"># Settings</span></span>
-<span id="cb5-32"><a href="#cb5-32"></a>n <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
-<span id="cb5-33"><a href="#cb5-33"></a>val_fracs <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="at">by =</span> <span class="fl">0.1</span>)</span>
-<span id="cb5-34"><a href="#cb5-34"></a>n_sim <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
-<span id="cb5-35"><a href="#cb5-35"></a>true_tau <span class="ot">&lt;-</span> <span class="dv">2</span></span>
-<span id="cb5-36"><a href="#cb5-36"></a></span>
-<span id="cb5-37"><a href="#cb5-37"></a><span class="co"># Run and collect full simulation results</span></span>
-<span id="cb5-38"><a href="#cb5-38"></a>all_sims <span class="ot">&lt;-</span> <span class="fu">lapply</span>(val_fracs, <span class="cf">function</span>(vf) {</span>
-<span id="cb5-39"><a href="#cb5-39"></a>  sims <span class="ot">&lt;-</span> <span class="fu">replicate</span>(n_sim, <span class="fu">simulate_once</span>(n, vf), <span class="at">simplify =</span> <span class="st">"matrix"</span>)</span>
-<span id="cb5-40"><a href="#cb5-40"></a>  </span>
-<span id="cb5-41"><a href="#cb5-41"></a>  tau_val_vec <span class="ot">&lt;-</span> sims[<span class="st">"tau_val"</span>, ]</span>
-<span id="cb5-42"><a href="#cb5-42"></a>  tau_ep_main_vec <span class="ot">&lt;-</span> sims[<span class="st">"tau_ep_main"</span>, ]</span>
-<span id="cb5-43"><a href="#cb5-43"></a>  tau_ep_val_vec <span class="ot">&lt;-</span> sims[<span class="st">"tau_ep_val"</span>, ]</span>
-<span id="cb5-44"><a href="#cb5-44"></a>  control_variate <span class="ot">&lt;-</span> tau_ep_val_vec <span class="sc">-</span> tau_ep_main_vec</span>
-<span id="cb5-45"><a href="#cb5-45"></a>  b_hat <span class="ot">&lt;-</span> <span class="fu">cov</span>(tau_val_vec, control_variate) <span class="sc">/</span> <span class="fu">var</span>(control_variate)</span>
-<span id="cb5-46"><a href="#cb5-46"></a>  tau_cv_vec <span class="ot">&lt;-</span> tau_val_vec <span class="sc">-</span> b_hat <span class="sc">*</span> control_variate</span>
-<span id="cb5-47"><a href="#cb5-47"></a>  </span>
-<span id="cb5-48"><a href="#cb5-48"></a>  <span class="fu">data.frame</span>(</span>
-<span id="cb5-49"><a href="#cb5-49"></a>    <span class="at">val_frac =</span> vf,</span>
-<span id="cb5-50"><a href="#cb5-50"></a>    <span class="at">validation_only =</span> tau_val_vec,</span>
-<span id="cb5-51"><a href="#cb5-51"></a>    <span class="at">error_prone_main =</span> tau_ep_main_vec,</span>
-<span id="cb5-52"><a href="#cb5-52"></a>    <span class="at">control_variates =</span> tau_cv_vec</span>
-<span id="cb5-53"><a href="#cb5-53"></a>  )</span>
-<span id="cb5-54"><a href="#cb5-54"></a>})</span>
-<span id="cb5-55"><a href="#cb5-55"></a></span>
-<span id="cb5-56"><a href="#cb5-56"></a><span class="co"># Reshape to long format</span></span>
-<span id="cb5-57"><a href="#cb5-57"></a>all_sims_df <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(all_sims) <span class="sc">|&gt;</span></span>
-<span id="cb5-58"><a href="#cb5-58"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(<span class="st">"validation_only"</span>, <span class="st">"error_prone_main"</span>, <span class="st">"control_variates"</span>),</span>
-<span id="cb5-59"><a href="#cb5-59"></a>               <span class="at">names_to =</span> <span class="st">"estimator"</span>, <span class="at">values_to =</span> <span class="st">"estimate"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb5-60"><a href="#cb5-60"></a>  <span class="fu">mutate</span>(<span class="at">bias =</span> estimate <span class="sc">-</span> true_tau)</span>
-<span id="cb5-61"><a href="#cb5-61"></a></span>
-<span id="cb5-62"><a href="#cb5-62"></a>bias_summary <span class="ot">&lt;-</span> all_sims_df <span class="sc">|&gt;</span></span>
-<span id="cb5-63"><a href="#cb5-63"></a>  <span class="fu">group_by</span>(val_frac, estimator) <span class="sc">|&gt;</span></span>
-<span id="cb5-64"><a href="#cb5-64"></a>  <span class="fu">summarise</span>(<span class="at">bias =</span> <span class="fu">mean</span>(bias), <span class="at">variance =</span> <span class="fu">var</span>(estimate), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb5-65"><a href="#cb5-65"></a>  <span class="fu">mutate</span>(<span class="at">RMSE =</span> <span class="fu">sqrt</span>(bias<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> variance)) <span class="sc">|&gt;</span> </span>
-<span id="cb5-66"><a href="#cb5-66"></a>  <span class="fu">mutate</span>(<span class="at">estimator =</span> <span class="fu">factor</span>(estimator, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"control_variates"</span>, <span class="st">"validation_only"</span>, <span class="st">"error_prone_main"</span>))) <span class="sc">|&gt;</span></span>
-<span id="cb5-67"><a href="#cb5-67"></a>  <span class="fu">mutate</span>(<span class="at">estimator =</span> <span class="fu">recode</span>(estimator, </span>
-<span id="cb5-68"><a href="#cb5-68"></a>                            <span class="at">validation_only =</span> <span class="st">"Validation Only"</span>,</span>
-<span id="cb5-69"><a href="#cb5-69"></a>                            <span class="at">error_prone_main =</span> <span class="st">"Error-Prone Main"</span>,</span>
-<span id="cb5-70"><a href="#cb5-70"></a>                            <span class="at">control_variates =</span> <span class="st">"Control Variates"</span>))</span>
-<span id="cb5-71"><a href="#cb5-71"></a></span>
-<span id="cb5-72"><a href="#cb5-72"></a></span>
-<span id="cb5-73"><a href="#cb5-73"></a><span class="co"># Create plots</span></span>
-<span id="cb5-74"><a href="#cb5-74"></a>p1 <span class="ot">&lt;-</span> bias_summary <span class="sc">|&gt;</span> </span>
-<span id="cb5-75"><a href="#cb5-75"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> val_frac, <span class="at">y =</span> bias, <span class="at">color =</span> estimator, <span class="at">shape =</span> estimator)) <span class="sc">+</span></span>
-<span id="cb5-76"><a href="#cb5-76"></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> .<span class="dv">5</span>) <span class="sc">+</span></span>
-<span id="cb5-77"><a href="#cb5-77"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb5-78"><a href="#cb5-78"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">18</span>) <span class="sc">+</span></span>
-<span id="cb5-79"><a href="#cb5-79"></a>  <span class="fu">theme</span>(<span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span></span>
-<span id="cb5-80"><a href="#cb5-80"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Validation sample fraction"</span>, <span class="at">y =</span> <span class="st">"Bias"</span>, <span class="at">color =</span> <span class="cn">NULL</span>, <span class="at">shape =</span> <span class="cn">NULL</span>)</span>
-<span id="cb5-81"><a href="#cb5-81"></a></span>
-<span id="cb5-82"><a href="#cb5-82"></a>p2 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(bias_summary, <span class="fu">aes</span>(<span class="at">x =</span> val_frac, <span class="at">y =</span> variance, <span class="at">color =</span> estimator, <span class="at">shape =</span> estimator)) <span class="sc">+</span></span>
-<span id="cb5-83"><a href="#cb5-83"></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> .<span class="dv">5</span>) <span class="sc">+</span></span>
-<span id="cb5-84"><a href="#cb5-84"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb5-85"><a href="#cb5-85"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">18</span>) <span class="sc">+</span></span>
-<span id="cb5-86"><a href="#cb5-86"></a>  <span class="fu">theme</span>(<span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span></span>
-<span id="cb5-87"><a href="#cb5-87"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Validation sample fraction"</span>, <span class="at">y =</span> <span class="st">"Variance"</span>, <span class="at">color =</span> <span class="cn">NULL</span>, <span class="at">shape =</span> <span class="cn">NULL</span>)</span>
-<span id="cb5-88"><a href="#cb5-88"></a></span>
-<span id="cb5-89"><a href="#cb5-89"></a><span class="co"># Combine with shared legend</span></span>
-<span id="cb5-90"><a href="#cb5-90"></a>p <span class="ot">&lt;-</span> (p1 <span class="sc">|</span> p2) <span class="sc">+</span> </span>
-<span id="cb5-91"><a href="#cb5-91"></a>  <span class="fu">plot_layout</span>(<span class="at">guides =</span> <span class="st">"collect"</span>) <span class="sc">&amp;</span> </span>
-<span id="cb5-92"><a href="#cb5-92"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span>
-<span id="cb5-93"><a href="#cb5-93"></a></span>
-<span id="cb5-94"><a href="#cb5-94"></a><span class="fu">print</span>(p)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>)</span>
+<span id="cb4-2"><a href="#cb4-2"></a></span>
+<span id="cb4-3"><a href="#cb4-3"></a>simulate_once <span class="ot">&lt;-</span> <span class="cf">function</span>(n, val_frac, <span class="at">misclass_rate =</span> <span class="fl">0.15</span>) {</span>
+<span id="cb4-4"><a href="#cb4-4"></a>  X1 <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb4-5"><a href="#cb4-5"></a>  X2 <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb4-6"><a href="#cb4-6"></a>  p <span class="ot">&lt;-</span> <span class="fu">plogis</span>(X1 <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> X2)</span>
+<span id="cb4-7"><a href="#cb4-7"></a>  D <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, p)</span>
+<span id="cb4-8"><a href="#cb4-8"></a>  D_star <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">runif</span>(n) <span class="sc">&lt;</span> misclass_rate, <span class="dv">1</span> <span class="sc">-</span> D, D)</span>
+<span id="cb4-9"><a href="#cb4-9"></a>  </span>
+<span id="cb4-10"><a href="#cb4-10"></a>  <span class="co"># Define potential outcomes</span></span>
+<span id="cb4-11"><a href="#cb4-11"></a>  Y0 <span class="ot">&lt;-</span> <span class="fu">exp</span>(X1) <span class="sc">/</span> <span class="dv">4</span> <span class="sc">+</span> <span class="fu">sin</span>(<span class="dv">2</span> <span class="sc">*</span> X2) <span class="sc">+</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb4-12"><a href="#cb4-12"></a>  Y1 <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">+</span> <span class="fu">exp</span>(X1) <span class="sc">/</span> <span class="dv">4</span> <span class="sc">+</span> <span class="fu">sin</span>(<span class="dv">2</span> <span class="sc">*</span> X2) <span class="sc">+</span> <span class="fu">rnorm</span>(n)  <span class="co"># add ATE = 2</span></span>
+<span id="cb4-13"><a href="#cb4-13"></a>  </span>
+<span id="cb4-14"><a href="#cb4-14"></a>  <span class="co"># Reveal observed outcome</span></span>
+<span id="cb4-15"><a href="#cb4-15"></a>  Y <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(D <span class="sc">==</span> <span class="dv">1</span>, Y1, Y0)</span>
+<span id="cb4-16"><a href="#cb4-16"></a>  </span>
+<span id="cb4-17"><a href="#cb4-17"></a>  <span class="co"># Validation indicator</span></span>
+<span id="cb4-18"><a href="#cb4-18"></a>  S <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">0</span>, n)</span>
+<span id="cb4-19"><a href="#cb4-19"></a>  S[<span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span>n, <span class="at">size =</span> n <span class="sc">*</span> val_frac)] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb4-20"><a href="#cb4-20"></a>  </span>
+<span id="cb4-21"><a href="#cb4-21"></a>  df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(Y, D, D_star, X1, X2, S)</span>
+<span id="cb4-22"><a href="#cb4-22"></a>  </span>
+<span id="cb4-23"><a href="#cb4-23"></a>  tau_val <span class="ot">&lt;-</span> <span class="fu">coef</span>(<span class="fu">lm</span>(Y <span class="sc">~</span> D <span class="sc">+</span> X1 <span class="sc">+</span> X2, <span class="at">data =</span> df <span class="sc">|&gt;</span> <span class="fu">filter</span>(S <span class="sc">==</span> <span class="dv">1</span>)))[<span class="st">"D"</span>]</span>
+<span id="cb4-24"><a href="#cb4-24"></a>  tau_ep_main <span class="ot">&lt;-</span> <span class="fu">coef</span>(<span class="fu">lm</span>(Y <span class="sc">~</span> D_star <span class="sc">+</span> X1 <span class="sc">+</span> X2, <span class="at">data =</span> df))[<span class="st">"D_star"</span>]</span>
+<span id="cb4-25"><a href="#cb4-25"></a>  tau_ep_val <span class="ot">&lt;-</span> <span class="fu">coef</span>(<span class="fu">lm</span>(Y <span class="sc">~</span> D_star <span class="sc">+</span> X1 <span class="sc">+</span> X2, <span class="at">data =</span> df <span class="sc">|&gt;</span> <span class="fu">filter</span>(S <span class="sc">==</span> <span class="dv">1</span>)))[<span class="st">"D_star"</span>]</span>
+<span id="cb4-26"><a href="#cb4-26"></a>  </span>
+<span id="cb4-27"><a href="#cb4-27"></a>  <span class="fu">setNames</span>(<span class="fu">c</span>(tau_val, tau_ep_main, tau_ep_val),</span>
+<span id="cb4-28"><a href="#cb4-28"></a>           <span class="fu">c</span>(<span class="st">"tau_val"</span>, <span class="st">"tau_ep_main"</span>, <span class="st">"tau_ep_val"</span>))</span>
+<span id="cb4-29"><a href="#cb4-29"></a>}</span>
+<span id="cb4-30"><a href="#cb4-30"></a></span>
+<span id="cb4-31"><a href="#cb4-31"></a><span class="co"># Settings</span></span>
+<span id="cb4-32"><a href="#cb4-32"></a>n <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb4-33"><a href="#cb4-33"></a>val_fracs <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="at">by =</span> <span class="fl">0.1</span>)</span>
+<span id="cb4-34"><a href="#cb4-34"></a>n_sim <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb4-35"><a href="#cb4-35"></a>true_tau <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb4-36"><a href="#cb4-36"></a></span>
+<span id="cb4-37"><a href="#cb4-37"></a><span class="co"># Run and collect full simulation results</span></span>
+<span id="cb4-38"><a href="#cb4-38"></a>all_sims <span class="ot">&lt;-</span> <span class="fu">lapply</span>(val_fracs, <span class="cf">function</span>(vf) {</span>
+<span id="cb4-39"><a href="#cb4-39"></a>  sims <span class="ot">&lt;-</span> <span class="fu">replicate</span>(n_sim, <span class="fu">simulate_once</span>(n, vf), <span class="at">simplify =</span> <span class="st">"matrix"</span>)</span>
+<span id="cb4-40"><a href="#cb4-40"></a>  </span>
+<span id="cb4-41"><a href="#cb4-41"></a>  tau_val_vec <span class="ot">&lt;-</span> sims[<span class="st">"tau_val"</span>, ]</span>
+<span id="cb4-42"><a href="#cb4-42"></a>  tau_ep_main_vec <span class="ot">&lt;-</span> sims[<span class="st">"tau_ep_main"</span>, ]</span>
+<span id="cb4-43"><a href="#cb4-43"></a>  tau_ep_val_vec <span class="ot">&lt;-</span> sims[<span class="st">"tau_ep_val"</span>, ]</span>
+<span id="cb4-44"><a href="#cb4-44"></a>  control_variate <span class="ot">&lt;-</span> tau_ep_val_vec <span class="sc">-</span> tau_ep_main_vec</span>
+<span id="cb4-45"><a href="#cb4-45"></a>  b_hat <span class="ot">&lt;-</span> <span class="fu">cov</span>(tau_val_vec, control_variate) <span class="sc">/</span> <span class="fu">var</span>(control_variate)</span>
+<span id="cb4-46"><a href="#cb4-46"></a>  tau_cv_vec <span class="ot">&lt;-</span> tau_val_vec <span class="sc">-</span> b_hat <span class="sc">*</span> control_variate</span>
+<span id="cb4-47"><a href="#cb4-47"></a>  </span>
+<span id="cb4-48"><a href="#cb4-48"></a>  <span class="fu">data.frame</span>(</span>
+<span id="cb4-49"><a href="#cb4-49"></a>    <span class="at">val_frac =</span> vf,</span>
+<span id="cb4-50"><a href="#cb4-50"></a>    <span class="at">validation_only =</span> tau_val_vec,</span>
+<span id="cb4-51"><a href="#cb4-51"></a>    <span class="at">error_prone_main =</span> tau_ep_main_vec,</span>
+<span id="cb4-52"><a href="#cb4-52"></a>    <span class="at">control_variates =</span> tau_cv_vec</span>
+<span id="cb4-53"><a href="#cb4-53"></a>  )</span>
+<span id="cb4-54"><a href="#cb4-54"></a>})</span>
+<span id="cb4-55"><a href="#cb4-55"></a></span>
+<span id="cb4-56"><a href="#cb4-56"></a><span class="co"># Reshape to long format</span></span>
+<span id="cb4-57"><a href="#cb4-57"></a>all_sims_df <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(all_sims) <span class="sc">|&gt;</span></span>
+<span id="cb4-58"><a href="#cb4-58"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(<span class="st">"validation_only"</span>, <span class="st">"error_prone_main"</span>, <span class="st">"control_variates"</span>),</span>
+<span id="cb4-59"><a href="#cb4-59"></a>               <span class="at">names_to =</span> <span class="st">"estimator"</span>, <span class="at">values_to =</span> <span class="st">"estimate"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb4-60"><a href="#cb4-60"></a>  <span class="fu">mutate</span>(<span class="at">bias =</span> estimate <span class="sc">-</span> true_tau)</span>
+<span id="cb4-61"><a href="#cb4-61"></a></span>
+<span id="cb4-62"><a href="#cb4-62"></a>bias_summary <span class="ot">&lt;-</span> all_sims_df <span class="sc">|&gt;</span></span>
+<span id="cb4-63"><a href="#cb4-63"></a>  <span class="fu">group_by</span>(val_frac, estimator) <span class="sc">|&gt;</span></span>
+<span id="cb4-64"><a href="#cb4-64"></a>  <span class="fu">summarise</span>(<span class="at">bias =</span> <span class="fu">mean</span>(bias), <span class="at">variance =</span> <span class="fu">var</span>(estimate), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb4-65"><a href="#cb4-65"></a>  <span class="fu">mutate</span>(<span class="at">RMSE =</span> <span class="fu">sqrt</span>(bias<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> variance)) <span class="sc">|&gt;</span> </span>
+<span id="cb4-66"><a href="#cb4-66"></a>  <span class="fu">mutate</span>(<span class="at">estimator =</span> <span class="fu">factor</span>(estimator, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"control_variates"</span>, <span class="st">"validation_only"</span>, <span class="st">"error_prone_main"</span>))) <span class="sc">|&gt;</span></span>
+<span id="cb4-67"><a href="#cb4-67"></a>  <span class="fu">mutate</span>(<span class="at">estimator =</span> <span class="fu">recode</span>(estimator, </span>
+<span id="cb4-68"><a href="#cb4-68"></a>                            <span class="at">validation_only =</span> <span class="st">"Validation Only"</span>,</span>
+<span id="cb4-69"><a href="#cb4-69"></a>                            <span class="at">error_prone_main =</span> <span class="st">"Error-Prone Main"</span>,</span>
+<span id="cb4-70"><a href="#cb4-70"></a>                            <span class="at">control_variates =</span> <span class="st">"Control Variates"</span>))</span>
+<span id="cb4-71"><a href="#cb4-71"></a></span>
+<span id="cb4-72"><a href="#cb4-72"></a></span>
+<span id="cb4-73"><a href="#cb4-73"></a><span class="co"># Create plots</span></span>
+<span id="cb4-74"><a href="#cb4-74"></a>p1 <span class="ot">&lt;-</span> bias_summary <span class="sc">|&gt;</span> </span>
+<span id="cb4-75"><a href="#cb4-75"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> val_frac, <span class="at">y =</span> bias, <span class="at">color =</span> estimator, <span class="at">shape =</span> estimator)) <span class="sc">+</span></span>
+<span id="cb4-76"><a href="#cb4-76"></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> .<span class="dv">5</span>) <span class="sc">+</span></span>
+<span id="cb4-77"><a href="#cb4-77"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb4-78"><a href="#cb4-78"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">18</span>) <span class="sc">+</span></span>
+<span id="cb4-79"><a href="#cb4-79"></a>  <span class="fu">theme</span>(<span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span></span>
+<span id="cb4-80"><a href="#cb4-80"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Validation sample fraction"</span>, <span class="at">y =</span> <span class="st">"Bias"</span>, <span class="at">color =</span> <span class="cn">NULL</span>, <span class="at">shape =</span> <span class="cn">NULL</span>)</span>
+<span id="cb4-81"><a href="#cb4-81"></a></span>
+<span id="cb4-82"><a href="#cb4-82"></a>p2 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(bias_summary, <span class="fu">aes</span>(<span class="at">x =</span> val_frac, <span class="at">y =</span> variance, <span class="at">color =</span> estimator, <span class="at">shape =</span> estimator)) <span class="sc">+</span></span>
+<span id="cb4-83"><a href="#cb4-83"></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> .<span class="dv">5</span>) <span class="sc">+</span></span>
+<span id="cb4-84"><a href="#cb4-84"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb4-85"><a href="#cb4-85"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">18</span>) <span class="sc">+</span></span>
+<span id="cb4-86"><a href="#cb4-86"></a>  <span class="fu">theme</span>(<span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span></span>
+<span id="cb4-87"><a href="#cb4-87"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Validation sample fraction"</span>, <span class="at">y =</span> <span class="st">"Variance"</span>, <span class="at">color =</span> <span class="cn">NULL</span>, <span class="at">shape =</span> <span class="cn">NULL</span>)</span>
+<span id="cb4-88"><a href="#cb4-88"></a></span>
+<span id="cb4-89"><a href="#cb4-89"></a><span class="co"># Combine with shared legend</span></span>
+<span id="cb4-90"><a href="#cb4-90"></a>p <span class="ot">&lt;-</span> (p1 <span class="sc">|</span> p2) <span class="sc">+</span> </span>
+<span id="cb4-91"><a href="#cb4-91"></a>  <span class="fu">plot_layout</span>(<span class="at">guides =</span> <span class="st">"collect"</span>) <span class="sc">&amp;</span> </span>
+<span id="cb4-92"><a href="#cb4-92"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output-display">
+</div>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="tutorial_files/figure-html/simulation_control_variates-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="768"></p>
+<p><img src="images/sim_cv.svg" class="img-fluid quarto-figure quarto-figure-center figure-img" width="800"></p>
 </figure>
-</div>
-</div>
 </div>
 
 

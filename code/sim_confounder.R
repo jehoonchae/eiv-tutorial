@@ -74,3 +74,5 @@ p <- ggplot() +
 pdf("./images/sim_confounder.pdf", width = 6, height = 6)
 print(p)
 dev.off()
+
+ggsave(file = "./images/sim_confounder.svg", plot = p, width = 6, height = 6)

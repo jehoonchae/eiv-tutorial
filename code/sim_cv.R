@@ -94,8 +94,8 @@ p <- (p1 | p2) +
   plot_layout(guides = "collect") & 
   theme(legend.position = "top")
 
-p
-
 pdf("./images/sim_cv.pdf", width = 8, height = 4)  
 print(p)                                
 dev.off()                               
+
+ggsave(file = "./images/sim_cv.svg", plot = p, width = 8, height = 4)

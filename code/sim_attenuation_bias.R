@@ -57,3 +57,5 @@ p <- ggplot() +
 pdf("./images/sim_bias.pdf", width = 4, height = 6)
 print(p)
 dev.off()
+
+ggsave(file = "./images/sim_bias.svg", plot = p, width = 4, height = 6)

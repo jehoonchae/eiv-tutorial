@@ -73,3 +73,5 @@ p <- ggplot(df_plot, aes(x = estimate, fill = method)) +
 pdf("./images/sim_reg_calibration.pdf", width = 8, height = 4)  
 print(p)                                
 dev.off()                               
+
+ggsave(file = "./images/sim_reg_calibration.svg", plot = p, width = 8, height = 4)
